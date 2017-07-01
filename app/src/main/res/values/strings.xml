@@ -18,4 +18,7 @@
     <string name="click_on_map_to_add_your_destinations">Click on map to add your destinations</string>
     <string name="click_on_marker_to_show_options">Click on marker to show options</string>
     <string name="bus_helper">Bus Helper</string>
+    <string name="please_choose_location">Please choose location</string>
+    <string name="test">Please choose location</string>
+
 </resources>

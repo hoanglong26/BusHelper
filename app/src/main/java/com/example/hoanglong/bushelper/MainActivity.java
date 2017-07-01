@@ -33,8 +33,8 @@ import android.widget.Button;
 import android.widget.Toast;
 
 import com.example.hoanglong.bushelper.model.Location;
-import com.example.hoanglong.bushelper.ormlite.DatabaseManager;
 import com.example.hoanglong.bushelper.model.PlacePrediction;
+import com.example.hoanglong.bushelper.ormlite.DatabaseManager;
 import com.example.hoanglong.bushelper.utils.Utils;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.PendingResult;
@@ -50,6 +50,7 @@ import com.google.android.gms.maps.model.LatLngBounds;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
+import org.junit.runner.RunWith;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -61,7 +62,6 @@ import rx.Observable;
 import rx.Observer;
 import rx.Subscriber;
 import rx.schedulers.Schedulers;
-
 
 public class MainActivity extends AppCompatActivity {
 
@@ -118,13 +118,6 @@ public class MainActivity extends AppCompatActivity {
         }
 //        DatabaseManager.getInstance().deleteAllLocations();
 
-//        mGoogleApiClient = new GoogleApiClient
-//                .Builder(this)
-//                .enableAutoManage(this, 0, this)
-//                .addApi(Places.GEO_DATA_API)
-//                .addApi(Places.PLACE_DETECTION_API)
-//                .addOnConnectionFailedListener(this)
-//                .build();
 
         Utils.initialGoogleApiClient(this);
         mGoogleApiClient = Utils.getGoogleApiClient();
@@ -166,7 +159,7 @@ public class MainActivity extends AppCompatActivity {
                     startActivity(intent);
                     finish();
                 } else {
-                    Toast.makeText(getBaseContext(), "Please choose location", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getBaseContext(), R.string.please_choose_location, Toast.LENGTH_SHORT).show();
 
                 }
                 return true;
@@ -194,7 +187,7 @@ public class MainActivity extends AppCompatActivity {
                     startActivity(intent);
                     finish();
                 } else {
-                    Toast.makeText(getBaseContext(), "Please choose location", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getBaseContext(), R.string.please_choose_location, Toast.LENGTH_SHORT).show();
 
                 }
             }
@@ -274,39 +267,6 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-//    public Observable<PlacePrediction> getAutocompleteResults(final GoogleApiClient mGoogleApiClient, final String query, final LatLngBounds bounds) {
-//        return Observable.create(new Observable.OnSubscribe<PlacePrediction>() {
-//            @Override
-//            public void call(Subscriber<? super PlacePrediction> subscriber) {
-//                PendingResult<AutocompletePredictionBuffer> results =
-//                        Places.GeoDataApi.getAutocompletePredictions(mGoogleApiClient, query,
-//                                bounds, null);
-//
-//                AutocompletePredictionBuffer autocompletePredictions = results
-//                        .await(60, TimeUnit.SECONDS);
-//
-//                final Status status = autocompletePredictions.getStatus();
-//                if (!status.isSuccess()) {
-//                    autocompletePredictions.release();
-//                    subscriber.onError(null);
-//                } else {
-//                    for (AutocompletePrediction autocompletePrediction : autocompletePredictions) {
-//                        subscriber.onNext(
-//                                new PlacePrediction(
-//                                        autocompletePrediction.getPlaceId(),
-//                                        autocompletePrediction.getFullText(new StyleSpan(Typeface.BOLD))
-//                                ));
-//                    }
-//                    autocompletePredictions.release();
-//                    subscriber.onCompleted();
-//                }
-//            }
-//
-//
-//        });
-//
-//    }
-
     private void populateAdapter(final String query) {
 
 
@@ -314,12 +274,11 @@ public class MainActivity extends AppCompatActivity {
 
         //Southwest corner to Northeast corner.
 //        final LatLngBounds bounds = new LatLngBounds(new LatLng(10.719123, 106.602913), new LatLng(10.885713, 106.646757));
-        final LatLngBounds bounds = Utils.toBounds(new LatLng(10.793093, 106.653773), 100);
+        final LatLngBounds bounds = Utils.toBounds(new LatLng(10.793093, 106.653773), 200);
 
         Observable<PlacePrediction> observable = Observable.create(new Observable.OnSubscribe<PlacePrediction>() {
             @Override
             public void call(Subscriber<? super PlacePrediction> subscriber) {
-//                RxSearch.getAutocompleteResults(mGoogleApiClient,query,bounds);
                 PendingResult<AutocompletePredictionBuffer> results =
                         Places.GeoDataApi.getAutocompletePredictions(mGoogleApiClient, query,
                                 bounds, null);
@@ -336,7 +295,8 @@ public class MainActivity extends AppCompatActivity {
                         subscriber.onNext(
                                 new PlacePrediction(
                                         autocompletePrediction.getPlaceId(),
-                                        autocompletePrediction.getFullText(new StyleSpan(Typeface.BOLD))
+                                        autocompletePrediction.getFullText(new StyleSpan(Typeface.BOLD)
+                                        )
                                 ));
                     }
                     autocompletePredictions.release();
@@ -367,6 +327,7 @@ public class MainActivity extends AppCompatActivity {
 
                                             c.addRow(new Object[]{locations.get(i).getId(), locations.get(i).getName(), locations.get(i).getLatitude(), locations.get(i).getLongitude()});
                                     }
+
                                     mAdapter.changeCursor(c);
                                 } else {
                                 }

@@ -111,7 +111,7 @@ public class Utils {
     }
 
     public static AttributedPhoto getAttributedPhoto(GoogleApiClient mGoogleApiClient, String placeId){
-        placeId="ChIJIcu5wc4tdTERJxL9vPGDacc";
+//        placeId="ChIJIcu5wc4tdTERJxL9vPGDacc";
 
         AttributedPhoto attributedPhoto = new AttributedPhoto(null,null);
 

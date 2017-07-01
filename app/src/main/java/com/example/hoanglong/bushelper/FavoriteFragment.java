@@ -2,9 +2,7 @@ package com.example.hoanglong.bushelper;
 
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.GridLayoutManager;
-import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -12,8 +10,6 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.example.hoanglong.bushelper.model.Favorite;
-import com.example.hoanglong.bushelper.model.Location;
-import com.example.hoanglong.bushelper.model.Member;
 import com.example.hoanglong.bushelper.ormlite.DatabaseManager;
 import com.mikepenz.fastadapter.FastAdapter;
 import com.mikepenz.fastadapter.IAdapter;
@@ -21,7 +17,6 @@ import com.mikepenz.fastadapter.commons.adapters.FastItemAdapter;
 
 import org.greenrobot.eventbus.EventBus;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.BindView;
@@ -56,43 +51,9 @@ public class FavoriteFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View rootView = inflater.inflate(R.layout.fragment_about, container, false);
+        View rootView = inflater.inflate(R.layout.fragment_favorite, container, false);
 
         ButterKnife.bind(this,rootView);
-
-//        DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(rvMember.getContext(),
-//                DividerItemDecoration.VERTICAL);
-//        dividerItemDecoration.setDrawable(getResources().getDrawable(R.drawable.divider_line));
-//        rvMember.addItemDecoration(dividerItemDecoration);
-//
-//        FastItemAdapter<Member> fastAdapter = new FastItemAdapter<>();
-//        rvMember.setLayoutManager(new LinearLayoutManager(getActivity().getBaseContext()));
-//
-//        //set our adapters to the RecyclerView
-//        //we wrap our FastAdapter inside the ItemAdapter -> This allows us to chain adapters for more complex useCases
-//        rvMember.setAdapter(fastAdapter);
-//
-//        List memList = new ArrayList();
-//        Member mem1 = new Member("Long");
-//        Member mem2 = new Member("Duc");
-//        Member mem3 = new Member("Khang");
-//
-//        memList.add(mem1);
-//        memList.add(mem2);
-//        memList.add(mem3);
-//
-//
-//        fastAdapter.add(memList);
-//
-//        fastAdapter.withSelectable(true);
-//        fastAdapter.withOnClickListener(new FastAdapter.OnClickListener<Member>() {
-//            @Override
-//            public boolean onClick(View v, IAdapter<Member> adapter, Member item, int position) {
-//                EventBus.getDefault().post(new FragmentAdapter.OpenEvent(position,10.45,10.45));
-//                return true;
-//            }
-//        });
-
 
 
         FastItemAdapter<Favorite> fastAdapter = new FastItemAdapter<>();
