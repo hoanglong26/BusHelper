@@ -1,0 +1,20 @@
+<resources>
+    <string name="app_name">Bus Helper</string>
+    <string name="title_home">Home</string>
+    <string name="title_dashboard">Dashboard</string>
+    <string name="title_notifications">Notifications</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="title_activity_maps">Map</string>
+    <string name="logout">Logout</string>
+    <string name="user">user</string>
+    <string name="add_to_favorite">Add to favorite</string>
+    <string name="remove_marker">Remove marker</string>
+    <string name="go">Go</string>
+    <string name="no_history">No history</string>
+    <string name="no_favorite">No favorite</string>
+    <string name="name">Name</string>
+    <string name="click_on_map_to_add_your_destinations">Click on map to add your destinations</string>
+    <string name="click_on_marker_to_show_options">Click on marker to show options</string>
+</resources>

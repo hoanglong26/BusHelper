@@ -1,0 +1,174 @@
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <com.sothree.slidinguppanel.SlidingUpPanelLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:sothree="http://schemas.android.com/apk/res-auto"
+        android:id="@+id/sliding_layout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="bottom"
+        sothree:umanoPanelHeight="50dp"
+        sothree:umanoShadowHeight="4dp">
+
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <fragment xmlns:tools="http://schemas.android.com/tools"
+                android:id="@+id/map"
+                android:name="com.google.android.gms.maps.SupportMapFragment"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                tools:context="com.example.hoanglong.bushelper.MapsActivity" />
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical">
+
+
+                <Button
+                    android:id="@+id/expandableButton1"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:background="#009688"
+                    android:drawableRight="@android:drawable/arrow_down_float"
+                    android:paddingRight="10dp"
+                    android:textColor="#fff"
+                    android:textSize="12sp" />
+
+                <com.github.aakira.expandablelayout.ExpandableRelativeLayout
+                    android:id="@+id/expandableLayout1"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/expandableButton1"
+                    android:background="#80CBC4"
+                    android:paddingLeft="10dp"
+                    android:paddingRight="10dp"
+                    android:paddingBottom="0dp"
+                    app:ael_duration="300"
+                    app:ael_expanded="false"
+                    app:ael_interpolator="bounce"
+                    app:ael_orientation="vertical"
+                    >
+
+                    <TextView
+                        android:layout_marginTop="10dp"
+                        android:layout_centerHorizontal="true"
+                        android:id="@+id/tutorial"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/click_on_map_to_add_your_destinations"
+                        android:textStyle="bold"
+                        android:textSize="16sp"/>
+
+
+                    <TextView
+                        android:layout_centerHorizontal="true"
+                        android:layout_below="@id/tutorial"
+                        android:id="@+id/tutorial2"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="5dp"
+                        android:text="@string/click_on_marker_to_show_options"
+                        android:textSize="16sp"/>
+
+
+                    <ImageView
+                        android:layout_below="@id/tutorial2"
+                        android:layout_centerHorizontal="true"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:src="@drawable/marks"/>
+
+                </com.github.aakira.expandablelayout.ExpandableRelativeLayout>
+
+                <android.support.design.widget.FloatingActionButton
+                    android:id="@+id/btnGo"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentBottom="true"
+                    android:layout_alignParentEnd="true"
+                    android:layout_marginBottom="10dp"
+                    android:layout_marginEnd="20dp"
+                    android:clickable="true"
+                    android:elevation="6dp"
+                    android:src="@drawable/icon_bus"
+                    android:theme="@style/FloatingActionButton2"
+                    app:elevation="6dp"
+                    app:fabSize="normal"
+                    app:rippleColor="#50ffffff" />
+
+
+                <com.andremion.counterfab.CounterFab
+                    android:id="@+id/btnAdd"
+                    android:layout_above="@id/btnGo"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentEnd="true"
+                    android:layout_marginEnd="10dp"
+                    android:elevation="6dp"
+                    android:src="@drawable/ic_add_location_black_24dp"
+                    android:theme="@style/FloatingActionButton2"
+                    app:elevation="6dp"
+                    app:fabSize="normal"
+                    app:rippleColor="#50ffffff"
+                    />
+
+                <!--<android.support.design.widget.FloatingActionButton-->
+                    <!--android:layout_above="@id/btnGo"-->
+                    <!--android:layout_width="wrap_content"-->
+                    <!--android:layout_height="wrap_content"-->
+                    <!--android:layout_alignParentEnd="true"-->
+                    <!--android:layout_marginBottom="10dp"-->
+                    <!--android:layout_marginEnd="20dp"-->
+                    <!--android:clickable="true"-->
+                    <!--android:elevation="6dp"-->
+                    <!--android:src="@drawable/icon_bus"-->
+                    <!--android:theme="@style/FloatingActionButton2"-->
+                    <!--app:elevation="6dp"-->
+                    <!--app:fabSize="normal"-->
+                    <!--app:rippleColor="#50ffffff" />-->
+
+
+
+
+            </RelativeLayout>
+        </FrameLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="10dp">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="6dp"
+                android:text="Instruction"
+                android:textColor="@android:color/black"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:drawableLeft="@drawable/ic_directions_black_24dp"
+                android:drawablePadding="5dp"/>
+
+            <TextView
+                android:id="@+id/tvInstruction"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="6dp"
+                android:text="Please search route"
+                android:textColor="@android:color/black"
+                android:textSize="16sp" />
+
+        </LinearLayout>
+
+    </com.sothree.slidinguppanel.SlidingUpPanelLayout>
+
+
+</FrameLayout>
+
+

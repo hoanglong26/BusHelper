@@ -1,0 +1,48 @@
+<resources>
+
+    <!-- Base application theme. -->
+    <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
+        <!-- Customize your theme here. -->
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+        <item name="colorAccent">@color/colorAccent</item>
+    </style>
+
+    <style name="AppTheme.NoActionbar" parent="AppTheme">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+    </style>
+
+    <style name="Toolbar">
+        <item name="android:textColorPrimary">@color/md_white_1000</item>
+        <item name="android:textColorSecondary">@color/md_white_1000</item>
+        <item name="android:textColorHint">@color/md_white_1000</item>
+        <item name="android:colorAccent">@color/colorPrimaryDark</item>
+        <item name="actionOverflowMenuStyle">@style/CMOptionsMenu</item>
+        <item name="android:autoCompleteTextViewStyle">@style/SearchViewStyle</item>
+        <item name="autoCompleteTextViewStyle">@style/SearchViewStyle</item>
+    </style>
+
+    <style name="SearchViewStyle" parent="@android:style/Widget.Holo.Light.AutoCompleteTextView">
+        <item name="android:textCursorDrawable">@drawable/cursor</item>
+    </style>
+
+    <style name="TabLayout">
+        <item name="colorAccent">#FFFFFF</item>
+    </style>
+
+    <style name="CMOptionsMenu" parent="Widget.AppCompat.PopupMenu.Overflow">
+        <item name="android:popupBackground">@color/md_black_1000</item>
+    </style>
+
+    <style name="FloatingActionButton">
+        <item name="colorAccent">@color/colorPrimaryDark</item>
+    </style>
+
+    <style name="FloatingActionButton2">
+        <item name="colorAccent">@color/md_teal_400</item>
+    </style>
+
+
+
+</resources>
