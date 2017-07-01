@@ -20,6 +20,9 @@ import android.support.v4.widget.CursorAdapter;
 import android.support.v4.widget.SimpleCursorAdapter;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.SearchView;
+import android.text.SpannableStringBuilder;
+import android.text.Spanned;
+import android.text.style.ImageSpan;
 import android.text.style.StyleSpan;
 import android.util.Log;
 import android.view.Menu;
@@ -256,11 +259,11 @@ public class MainActivity extends AppCompatActivity {
                 switch (item.getItemId()) {
                     case R.id.navigation_history:
                         getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, adapterViewPager.getItem(0)).commit();
-                        getSupportActionBar().setTitle("History");
+//                        getSupportActionBar().setTitle("History");
                         return true;
                     case R.id.navigation_about:
                         getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, adapterViewPager.getItem(1)).commit();
-                        getSupportActionBar().setTitle("About");
+//                        getSupportActionBar().setTitle("Favorite");
                         return true;
                 }
                 return false;
@@ -393,25 +396,31 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
+//        getMenuInflater().inflate(R.menu.origin, menu);
+////        try {
+////            Field[] fields = menu.getClass().getDeclaredFields();
+////            for (Field field : fields) {
+////                if ("mPopup".equals(field.getName())) {
+////                    field.setAccessible(true);
+////                    Object menuPopupHelper = field.get(menu);
+////                    Class<?> classPopupHelper = Class.forName(menuPopupHelper.getClass().getName());
+////                    Method setForceIcons = classPopupHelper.getMethod("setForceShowIcon", boolean.class);
+////                    setForceIcons.invoke(menuPopupHelper, true);
+////                    break;
+////                }
+////            }
+////        } catch (Exception e) {
+////            e.printStackTrace();
+////        }
+//
+//        menu.getItem(0).setIcon(R.drawable.ic_power_settings_new_black_24dp);
         getMenuInflater().inflate(R.menu.origin, menu);
-//        try {
-//            Field[] fields = menu.getClass().getDeclaredFields();
-//            for (Field field : fields) {
-//                if ("mPopup".equals(field.getName())) {
-//                    field.setAccessible(true);
-//                    Object menuPopupHelper = field.get(menu);
-//                    Class<?> classPopupHelper = Class.forName(menuPopupHelper.getClass().getName());
-//                    Method setForceIcons = classPopupHelper.getMethod("setForceShowIcon", boolean.class);
-//                    setForceIcons.invoke(menuPopupHelper, true);
-//                    break;
-//                }
-//            }
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        }
 
-        menu.getItem(0).setIcon(R.drawable.ic_power_settings_new_black_24dp);
-
+        MenuItem item = menu.findItem(R.id.action_logout);
+        SpannableStringBuilder builder = new SpannableStringBuilder("*  Logout");
+        // replace "*" with icon
+        builder.setSpan(new ImageSpan(this, R.drawable.ic_power_settings_new_black_24dp), 0, 1, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+        item.setTitle(builder);
         return super.onCreateOptionsMenu(menu);
     }
 
