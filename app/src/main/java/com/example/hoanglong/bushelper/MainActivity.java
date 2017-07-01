@@ -365,7 +365,6 @@ public class MainActivity extends AppCompatActivity {
                                             c.addRow(new Object[]{locations.get(i).getId(), locations.get(i).getName(), locations.get(i).getLatitude(), locations.get(i).getLongitude()});
                                     }
                                     mAdapter.changeCursor(c);
-//                                                            places.getFullText(new StyleSpan(Typeface.BOLD)) + ""
                                 } else {
                                 }
                                 places.release();
@@ -387,58 +386,6 @@ public class MainActivity extends AppCompatActivity {
         };
 
         observable.subscribeOn(Schedulers.io()).subscribe(observer);
-
-
-//        Places.GeoDataApi.getAutocompletePredictions(mGoogleApiClient, query, bounds, null)
-//                .setResultCallback(
-//                        new ResultCallback<AutocompletePredictionBuffer>() {
-//                            @Override
-//                            public void onResult(AutocompletePredictionBuffer buffer) {
-//
-//                                if (buffer == null)
-//                                    return;
-//
-//                                if (buffer.getStatus().isSuccess()) {
-//                                    for (final AutocompletePrediction prediction : buffer) {
-//
-//                                        Places.GeoDataApi.getPlaceById(mGoogleApiClient, prediction.getPlaceId())
-//                                                .setResultCallback(new ResultCallback<PlaceBuffer>() {
-//                                                    @Override
-//                                                    public void onResult(PlaceBuffer places) {
-//                                                        if (places.getStatus().isSuccess() && places.getCount() > 0) {
-//                                                            final Place myPlace = places.get(0);
-//                                                            Location aLocation = new Location(0, myPlace.getName() + ", " + myPlace.getAddress(), myPlace.getLatLng().latitude, myPlace.getLatLng().longitude);
-//                                                            locations.add(aLocation);
-//                                                            final MatrixCursor c = new MatrixCursor(new String[]{BaseColumns._ID, "busStopName", "lat", "long"});
-//                                                            for (int i = 0; i < locations.size(); i++) {
-//                                                                if (locations.get(i).getName().toLowerCase().startsWith(query.toLowerCase()))
-//
-//                                                                    c.addRow(new Object[]{locations.get(i).getId(), locations.get(i).getName(), locations.get(i).getLatitude(), locations.get(i).getLongitude()});
-//                                                            }
-//                                                            mAdapter.changeCursor(c);
-////                                                            places.getFullText(new StyleSpan(Typeface.BOLD)) + ""
-//                                                        } else {
-//                                                        }
-//                                                        places.release();
-//                                                    }
-//                                                });
-//
-//
-//                                    }
-//                                }
-//
-//                                final MatrixCursor c = new MatrixCursor(new String[]{BaseColumns._ID, "busStopName", "lat", "long"});
-//                                for (int i = 0; i < locations.size(); i++) {
-//                                    if (locations.get(i).getName().toLowerCase().startsWith(query.toLowerCase()))
-//
-//                                        c.addRow(new Object[]{locations.get(i).getId(), locations.get(i).getName(), locations.get(i).getLatitude(), locations.get(i).getLongitude()});
-//                                }
-//                                mAdapter.changeCursor(c);
-//
-//                                //Prevent memory leak by releasing buffer
-//                                buffer.release();
-//                            }
-//                        }, 60, TimeUnit.SECONDS);
 
 
     }
