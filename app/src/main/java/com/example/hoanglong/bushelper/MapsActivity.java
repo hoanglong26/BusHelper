@@ -383,7 +383,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                             @Override
                                             public void call(Subscriber<? super AttributedPhoto> subscriber) {
 
-                                                subscriber.onNext(Utils.getAttributedPhoto(mGoogleApiClient, response.body().getGeocodedWaypoints().get(finalI).getPlace_id()));
+                                                subscriber.onNext(Utils.getAttributedPhoto(response.body().getGeocodedWaypoints().get(finalI).getPlace_id()));
                                                 subscriber.onCompleted();
 
 

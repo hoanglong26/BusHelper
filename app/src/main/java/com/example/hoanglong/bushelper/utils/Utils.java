@@ -110,7 +110,7 @@ public class Utils {
         return new LatLngBounds(southwest, northeast);
     }
 
-    public static AttributedPhoto getAttributedPhoto(GoogleApiClient mGoogleApiClient, String placeId){
+    public static AttributedPhoto getAttributedPhoto( String placeId){
 //        placeId="ChIJIcu5wc4tdTERJxL9vPGDacc";
 
         AttributedPhoto attributedPhoto = new AttributedPhoto(null,null);
