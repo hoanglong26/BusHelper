@@ -37,7 +37,8 @@
                     android:drawableRight="@android:drawable/arrow_down_float"
                     android:paddingRight="10dp"
                     android:textColor="#fff"
-                    android:textSize="12sp" />
+                    android:textSize="12sp"
+                    android:text="@string/please_choose_location"/>
 
                 <com.github.aakira.expandablelayout.ExpandableRelativeLayout
                     android:id="@+id/expandableLayout1"

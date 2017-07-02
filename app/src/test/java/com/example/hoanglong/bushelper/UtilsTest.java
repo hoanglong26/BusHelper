@@ -1,10 +1,11 @@
-package com.example.hoanglong.bushelper.utils;
+package com.example.hoanglong.bushelper;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 
 import com.example.hoanglong.bushelper.BuildConfig;
 import com.example.hoanglong.bushelper.R;
+import com.example.hoanglong.bushelper.utils.Utils;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 
@@ -29,9 +30,6 @@ public class UtilsTest {
     @Test
     public void stringToBitMap() throws Exception {
 //        Activity activity = Robolectric.setupActivity(MainActivity.class);//
-//        String manifestProperty = System.getProperty("android.manifest");
-//        String resourcesProperty = System.getProperty("android.resources");
-//        String assetsProperty = System.getProperty("android.assets");
         Bitmap thumbnail = BitmapFactory.decodeResource(RuntimeEnvironment.application.getResources(), R.drawable.thumbnail);
         String tmp = Utils.BitMapToString(thumbnail);
         assertEquals(true, compareBitmap(Utils.StringToBitMap(tmp),thumbnail));
@@ -51,16 +49,6 @@ public class UtilsTest {
     }
 
     @Test
-    public void bitMapToString() throws Exception {
-
-    }
-
-    @Test
-    public void initialGoogleApiClient() throws Exception {
-
-    }
-
-    @Test
     public void toBounds() throws Exception {
 
         LatLng southwest = new LatLng(10.898201353892782, 106.29816832441604);
@@ -69,11 +57,6 @@ public class UtilsTest {
         LatLngBounds sampleBounds = new LatLngBounds(southwest, northeast);
 
         assertEquals(sampleBounds, Utils.toBounds(new LatLng(10.9, 106.3), 200));
-
-    }
-
-    @Test
-    public void getAttributedPhoto() throws Exception {
 
     }
 

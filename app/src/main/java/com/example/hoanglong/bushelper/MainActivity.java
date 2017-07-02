@@ -151,6 +151,9 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public boolean onQueryTextSubmit(String query) {
                 searchView.onActionViewCollapsed();
+                if(!Utils.checkInternetOn(getBaseContext())){
+                    Utils.createNetErrorDialog(MainActivity.this);
+                }
                 Intent intent = new Intent(getBaseContext(), MapsActivity.class);
                 if (result != null) {
                     Toast.makeText(getBaseContext(), "Starting Map", Toast.LENGTH_SHORT).show();
@@ -179,6 +182,9 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 searchView.onActionViewCollapsed();
+                if(!Utils.checkInternetOn(getBaseContext())){
+                    Utils.createNetErrorDialog(MainActivity.this);
+                }
                 Intent intent = new Intent(getBaseContext(), MapsActivity.class);
                 if (result != null) {
                     Toast.makeText(getBaseContext(), "Starting Map", Toast.LENGTH_SHORT).show();
@@ -263,7 +269,9 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-
+        if(!Utils.checkInternetOn(this)){
+            Utils.createNetErrorDialog(this);
+        }
     }
 
 
@@ -407,18 +415,7 @@ public class MainActivity extends AppCompatActivity {
     //Subscribe action for Event Bus
     @Subscribe
     public void onEvent(FragmentAdapter.OpenEvent event) {
-//        EventBus.getDefault().unregister(this);
-//        Intent intent = new Intent(this, ResidentDetailActivity.class);
-//        intent.putExtra("patient", event.patient);
-//        intent.putExtra("position", event.position);
-//        intent.putExtra("fromWhat", event.from);
-//        startActivityForResult(intent, EDIT_USER);
-//        if (event.type == 0) {
-//            Toast.makeText(getBaseContext(), event.position + " haha", Toast.LENGTH_SHORT).show();
-//
-//        } else {
-//            Toast.makeText(getBaseContext(), event.text, Toast.LENGTH_SHORT).show();
-//        }
+
 
         Toast.makeText(getBaseContext(), "Starting Map", Toast.LENGTH_SHORT).show();
 

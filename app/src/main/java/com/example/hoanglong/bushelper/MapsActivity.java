@@ -218,9 +218,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         mLocation = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
 
         myLocation = new LatLng(mLocation.getLatitude(), mLocation.getLongitude());
-        mMap.addMarker(new MarkerOptions().position(myLocation).title("Your location"));
+        mMap.addMarker(new MarkerOptions().position(myLocation).title(getString(R.string.your_location)));
         mMap.moveCamera(CameraUpdateFactory.newLatLng(myLocation));
-        mMap.animateCamera(CameraUpdateFactory.zoomTo(15));
+        mMap.animateCamera(CameraUpdateFactory.zoomTo(14));
 
 
         //Initialize the first stop
@@ -229,7 +229,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         MarkerPoints.add(busStart);
         MarkerOptions options1 = new MarkerOptions();
         options1.position(busStart);
-        options1.title("Final stop");
+        options1.title(getString(R.string.final_stop));
         options1.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_YELLOW));
         options1.draggable(true);
         mMap.addMarker(options1);
@@ -272,7 +272,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         MarkerPoints.add(tmp);
                         MarkerOptions options1 = new MarkerOptions();
                         options1.position(tmp);
-                        options1.title("Middle stop");
+                        options1.title(getString(R.string.middle_stop));
                         options1.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_ORANGE));
                         options1.draggable(true);
                         mMap.addMarker(options1);
@@ -300,7 +300,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 // Setting the position of the marker
                 options.position(point);
                 options.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_YELLOW));
-                options.title("Final stop");
+                options.title(getString(R.string.final_stop));
                 options.draggable(true);
 
                 // Add new marker to the Google Map Android API V2
@@ -371,7 +371,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                         MarkerPoints.set(0, origin);
 
                                     }
-                                    Toast.makeText(getBaseContext(), "No route", Toast.LENGTH_SHORT).show();
+                                    Toast.makeText(getBaseContext(), R.string.no_route, Toast.LENGTH_SHORT).show();
                                 } else {
                                     for (int i = 0; i < response.body().getRoutes().size(); i++) {
                                         List<Step> instruction = response.body().getRoutes().get(i).getLegs().get(i).getSteps();
@@ -572,12 +572,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     @Override
     public void onMarkerDragEnd(Marker marker) {
         if (MarkerPoints.size() == 2) {
-            if (marker.getTitle().equals("Middle stop")) {
+            if (marker.getTitle().equals(getString(R.string.middle_stop))) {
                 origin = marker.getPosition();
                 MarkerPoints.set(0, origin);
             }
 
-            if (marker.getTitle().equals("Final stop")) {
+            if (marker.getTitle().equals(getString(R.string.final_stop))) {
                 dest = marker.getPosition();
                 MarkerPoints.set(1, dest);
 
@@ -592,7 +592,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 line2.remove();
             }
         } else {
-            if (marker.getTitle().equals("Final stop")) {
+            if (marker.getTitle().equals(getString(R.string.final_stop))) {
                 dest = marker.getPosition();
                 origin = myLocation;
                 MarkerPoints.set(0, dest);
@@ -667,10 +667,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
                                 if (!locations.contains(selectedLocation)) {
                                     DatabaseManager.getInstance().addFavorite(selectedLocation);
-                                    Toast.makeText(getBaseContext(),"Added", Toast.LENGTH_SHORT).show();
+                                    Toast.makeText(getBaseContext(), R.string.added_to_list, Toast.LENGTH_SHORT).show();
 
                                 }else{
-                                    Toast.makeText(getBaseContext(),"This place already in the list", Toast.LENGTH_SHORT).show();
+                                    Toast.makeText(getBaseContext(), R.string.already_exist, Toast.LENGTH_SHORT).show();
                                 }
 
                                 if (DatabaseManager.getInstance().getAllFavorites().size() > 20) {
@@ -681,19 +681,19 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                 break;
 
                             case R.id.removeMarker:
-                                if(!marker.getTitle().equals("Your location")) {
-                                    Toast.makeText(getBaseContext(), "Marker has been removed", Toast.LENGTH_SHORT).show();
+                                if(!marker.getTitle().equals(getString(R.string.your_location))) {
+                                    Toast.makeText(getBaseContext(), R.string.marker_removed, Toast.LENGTH_SHORT).show();
                                 }else{
-                                    Toast.makeText(getBaseContext(), "Cannot remove this marker", Toast.LENGTH_SHORT).show();
+                                    Toast.makeText(getBaseContext(), R.string.cannot_remove_marker, Toast.LENGTH_SHORT).show();
 
                                 }
                                 if (MarkerPoints.size() == 2) {
-                                    if (marker.getTitle().equals("Middle stop")) {
+                                    if (marker.getTitle().equals(getString(R.string.middle_stop))) {
                                         origin = myLocation;
                                         MarkerPoints.set(0, origin);
                                     }
 
-                                    if (marker.getTitle().equals("Final stop")) {
+                                    if (marker.getTitle().equals(getString(R.string.final_stop))) {
 //                                        dest = myLocation;
 //                                        MarkerPoints.set(1, dest);
 
@@ -730,7 +730,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                     btnAdd.setCount(1);
                                     isMutipleMarker = false;
                                 } else {
-                                    if (marker.getTitle().equals("Final stop")) {
+                                    if (marker.getTitle().equals(getString(R.string.final_stop))) {
                                         dest = myLocation;
                                         origin = myLocation;
                                         MarkerPoints.set(0, dest);

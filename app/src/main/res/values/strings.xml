@@ -20,5 +20,13 @@
     <string name="bus_helper">Bus Helper</string>
     <string name="please_choose_location">Please choose location</string>
     <string name="test">Please choose location</string>
+    <string name="marker_removed">Marker has been removed</string>
+    <string name="cannot_remove_marker">Cannot remove this marker</string>
+    <string name="already_exist">This place already in the list</string>
+    <string name="no_route">No route</string>
+    <string name="added_to_list">Added to list</string>
+    <string name="your_location">Your location</string>
+    <string name="middle_stop">Middle stop</string>
+    <string name="final_stop">Final stop</string>
 
 </resources>
