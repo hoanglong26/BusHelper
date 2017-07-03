@@ -24,7 +24,7 @@
         android:roundIcon="@drawable/icon_bus"
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
-        android:name=".dagger2.App">
+        android:name=".App">
 
 
         <activity

@@ -1,4 +1,4 @@
-package com.example.hoanglong.bushelper.dagger2;
+package com.example.hoanglong.bushelper;
 
 import android.app.Application;
 

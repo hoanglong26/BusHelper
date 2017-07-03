@@ -113,9 +113,7 @@ public class MainActivity extends AppCompatActivity {
         getSupportActionBar().setElevation(0);
         DatabaseManager.init(getBaseContext());
 
-        if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            Utils.checkLocationPermission(this);
-        }
+
 //        DatabaseManager.getInstance().deleteAllLocations();
 
 
@@ -154,6 +152,10 @@ public class MainActivity extends AppCompatActivity {
                 if(!Utils.checkInternetOn(getBaseContext())){
                     Utils.createNetErrorDialog(MainActivity.this);
                 }
+
+                if(!Utils.isLocationEnabled(MainActivity.this)){
+                    Utils.createLocationErrorDialog(MainActivity.this);
+                }
                 Intent intent = new Intent(getBaseContext(), MapsActivity.class);
                 if (result != null) {
                     Toast.makeText(getBaseContext(), "Starting Map", Toast.LENGTH_SHORT).show();
@@ -185,6 +187,11 @@ public class MainActivity extends AppCompatActivity {
                 if(!Utils.checkInternetOn(getBaseContext())){
                     Utils.createNetErrorDialog(MainActivity.this);
                 }
+
+
+                if(!Utils.isLocationEnabled(MainActivity.this)){
+                    Utils.createLocationErrorDialog(MainActivity.this);
+                }
                 Intent intent = new Intent(getBaseContext(), MapsActivity.class);
                 if (result != null) {
                     Toast.makeText(getBaseContext(), "Starting Map", Toast.LENGTH_SHORT).show();
@@ -204,9 +211,19 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 //Setup to get location
+                if(!Utils.checkInternetOn(getBaseContext())){
+                    Utils.createNetErrorDialog(MainActivity.this);
+                }
+
+                if(!Utils.isLocationEnabled(MainActivity.this)){
+                    Utils.createLocationErrorDialog(MainActivity.this);
+                }
+
                 if (ActivityCompat.checkSelfPermission(getBaseContext(), android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getBaseContext(), android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
                     return;
                 }
+
+
                 mLocation = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
                 result = new Location(0, "My location", mLocation.getLatitude(), mLocation.getLongitude());
                 Intent intent = new Intent(getBaseContext(), MapsActivity.class);
@@ -269,8 +286,17 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+
+        if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            Utils.checkLocationPermission(this);
+        }
+
         if(!Utils.checkInternetOn(this)){
             Utils.createNetErrorDialog(this);
+        }
+
+        if(!Utils.isLocationEnabled(MainActivity.this)){
+            Utils.createLocationErrorDialog(MainActivity.this);
         }
     }
 
