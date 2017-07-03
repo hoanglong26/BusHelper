@@ -237,6 +237,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         //Initialize your location
         MarkerOptions options2 = new MarkerOptions();
         options2.position(myLocation);
+        options2.title(getString(R.string.your_location));
         options2.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED));
         mMap.addMarker(options2);
 
@@ -278,6 +279,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     MarkerOptions options2 = new MarkerOptions();
                     options2.position(myLocation);
                     options2.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED));
+                    options2.title(getString(R.string.your_location));
                     mMap.addMarker(options2);
 
                     totalTime = 0;
@@ -622,7 +624,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         serverAPI = retrofit.create(ServerAPI.class);
 
 
-        serverAPI.getPlaceID(marker.getPosition().latitude+","+marker.getPosition().longitude).enqueue(new Callback<PlaceDetail>() {
+        serverAPI.getPlaceID(marker.getPosition().latitude + "," + marker.getPosition().longitude).enqueue(new Callback<PlaceDetail>() {
             @Override
             public void onResponse(Call<PlaceDetail> call, Response<PlaceDetail> response) {
                 String place_id = response.body().getAddr_comp().get(0).getPlace_id();
@@ -653,7 +655,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 //registering popup with OnMenuItemClickListener
                 popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
                     public boolean onMenuItemClick(MenuItem item) {
-                        switch (item.getItemId()){
+                        switch (item.getItemId()) {
                             case R.id.addFavorite:
                                 List locations = DatabaseManager.getInstance().getAllFavorites();
                                 Favorite selectedLocation = new Favorite();
@@ -666,7 +668,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                     DatabaseManager.getInstance().addFavorite(selectedLocation);
                                     Toast.makeText(getBaseContext(), R.string.added_to_list, Toast.LENGTH_SHORT).show();
 
-                                }else{
+                                } else {
                                     Toast.makeText(getBaseContext(), R.string.already_exist, Toast.LENGTH_SHORT).show();
                                 }
 
@@ -678,71 +680,75 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                 break;
 
                             case R.id.removeMarker:
-                                if(!marker.getTitle().equals(getString(R.string.your_location))) {
-                                    Toast.makeText(getBaseContext(), R.string.marker_removed, Toast.LENGTH_SHORT).show();
-                                }else{
-                                    Toast.makeText(getBaseContext(), R.string.cannot_remove_marker, Toast.LENGTH_SHORT).show();
+                                if (!marker.getTitle().equals(getString(R.string.your_location))) {
+                                    if (MarkerPoints.size() == 2) {
+                                        if (marker.getTitle().equals(getString(R.string.middle_stop))) {
+                                            origin = myLocation;
+                                            MarkerPoints.set(0, origin);
+                                        }
 
-                                }
-                                if (MarkerPoints.size() == 2) {
-                                    if (marker.getTitle().equals(getString(R.string.middle_stop))) {
-                                        origin = myLocation;
-                                        MarkerPoints.set(0, origin);
-                                    }
-
-                                    if (marker.getTitle().equals(getString(R.string.final_stop))) {
+                                        if (marker.getTitle().equals(getString(R.string.final_stop))) {
 //                                        dest = myLocation;
 //                                        MarkerPoints.set(1, dest);
 
-                                        dest = MarkerPoints.get(0);
-                                        origin = myLocation;
-                                        MarkerPoints.remove(1);
-                                        MarkerPoints.set(0,dest);
+                                            dest = MarkerPoints.get(0);
+                                            origin = myLocation;
+                                            MarkerPoints.remove(1);
+                                            MarkerPoints.set(0, dest);
 
-                                        mMap.clear();
-
-                                        MarkerOptions options = new MarkerOptions();
-                                        options.position(myLocation);
-                                        options.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED));
-                                        mMap.addMarker(options);
+                                            mMap.clear();
 
 
-                                        MarkerOptions options2 = new MarkerOptions();
-                                        options2.position(dest);
-                                        options2.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_YELLOW));
-                                        mMap.addMarker(options2);
+                                            MarkerOptions options2 = new MarkerOptions();
+                                            options2.position(dest);
+                                            options2.title(getString(R.string.final_stop));
+                                            options2.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_YELLOW));
+                                            mMap.addMarker(options2);
 
 
+                                            MarkerOptions options = new MarkerOptions();
+                                            options.position(myLocation);
+                                            options.title(getString(R.string.your_location));
+                                            options.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED));
+                                            mMap.addMarker(options);
+
+
+                                        }
+
+                                        if (line != null) {
+                                            line.remove();
+
+                                        }
+
+                                        if (line2 != null) {
+                                            line2.remove();
+                                        }
+
+                                        btnAdd.setCount(1);
+                                        isMutipleMarker = false;
+                                    } else {
+                                        if (marker.getTitle().equals(getString(R.string.final_stop))) {
+                                            dest = myLocation;
+                                            origin = myLocation;
+                                            MarkerPoints.set(0, dest);
+
+                                        }
+
+                                        if (line2 != null) {
+                                            line2.remove();
+                                        }
                                     }
-
-                                    if (line != null) {
-                                        line.remove();
-
-                                    }
-
-                                    if (line2 != null) {
-                                        line2.remove();
-                                    }
-
-                                    btnAdd.setCount(1);
-                                    isMutipleMarker = false;
+                                    totalTime = 0;
+                                    totalDistance = 0;
+                                    textInstruction = "";
+                                    checkMultipleClick = false;
+                                    marker.remove();
+                                    Toast.makeText(getBaseContext(), R.string.marker_removed, Toast.LENGTH_SHORT).show();
                                 } else {
-                                    if (marker.getTitle().equals(getString(R.string.final_stop))) {
-                                        dest = myLocation;
-                                        origin = myLocation;
-                                        MarkerPoints.set(0, dest);
+                                    Toast.makeText(getBaseContext(), R.string.cannot_remove_marker, Toast.LENGTH_SHORT).show();
 
-                                    }
-
-                                    if (line2 != null) {
-                                        line2.remove();
-                                    }
                                 }
-                                totalTime = 0;
-                                totalDistance = 0;
-                                textInstruction = "";
-                                checkMultipleClick = false;
-                                marker.remove();
+
                                 break;
                         }
 
@@ -758,10 +764,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
             }
         });
-
-
-
-
 
 
         return false;
