@@ -3,8 +3,8 @@ package com.example.hoanglong.bushelper.ormlite;
 import android.content.Context;
 import android.database.SQLException;
 
-import com.example.hoanglong.bushelper.model.Favorite;
-import com.example.hoanglong.bushelper.model.Location;
+import com.example.hoanglong.bushelper.entities.Favorite;
+import com.example.hoanglong.bushelper.entities.Location;
 
 import java.util.List;
 

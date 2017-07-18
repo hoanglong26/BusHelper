@@ -11,7 +11,8 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         tools:context="com.di.controller.Loading"
-        tools:showIn="@layout/activity_loading">
+        tools:showIn="@layout/activity_loading"
+        android:background="@color/md_grey_100">
 
         <ImageView
             android:id="@+id/ivLoading"

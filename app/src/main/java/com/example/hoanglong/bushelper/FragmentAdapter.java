@@ -24,23 +24,13 @@ public class FragmentAdapter extends FragmentPagerAdapter {
                 return HistoryFragment.newInstance("");
             case 1:
                 return FavoriteFragment.newInstance("");
-//            case 2:
-//                return RelativesFragment.newInstance("");
+
             default:
                 return HistoryFragment.newInstance("");
 
         }
 
     }
-
-
-//    @Override
-//    public int getCount() {
-//        if (userRole.equals("5")) {
-//            return 2;
-//        }
-//        return 3;
-//    }
 
 
     @Override

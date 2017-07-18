@@ -9,7 +9,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.example.hoanglong.bushelper.model.Favorite;
+import com.example.hoanglong.bushelper.entities.Favorite;
 import com.example.hoanglong.bushelper.ormlite.DatabaseManager;
 import com.mikepenz.fastadapter.FastAdapter;
 import com.mikepenz.fastadapter.IAdapter;

@@ -1,4 +1,4 @@
-package com.example.hoanglong.bushelper.model;
+package com.example.hoanglong.bushelper.POJO;
 
 import android.graphics.Bitmap;
 

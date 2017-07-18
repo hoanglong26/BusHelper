@@ -1,4 +1,4 @@
-package com.example.hoanglong.bushelper.model;
+package com.example.hoanglong.bushelper.entities;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;

@@ -1,11 +1,18 @@
 package com.example.hoanglong.bushelper.api;
 
 
-import com.example.hoanglong.bushelper.POJO.PlaceDetail;
-import com.example.hoanglong.bushelper.POJO.RouteList;
+import com.example.hoanglong.bushelper.POJO.BusStopDB;
+import com.example.hoanglong.bushelper.POJO.UserAccount;
+import com.example.hoanglong.bushelper.POJO.googlemap.PlaceDetail;
+import com.example.hoanglong.bushelper.POJO.googlemap.RouteList;
+import com.google.gson.JsonObject;
+
+import java.util.List;
 
 import retrofit2.Call;
+import retrofit2.http.Body;
 import retrofit2.http.GET;
+import retrofit2.http.POST;
 import retrofit2.http.Query;
 
 /**
@@ -20,6 +27,14 @@ public interface ServerAPI {
     @GET("api/geocode/json?sensor=true&key=AIzaSyAl_-UNqx3oY3vVPB21ieVHaGeenes2Hb8")
     Call<PlaceDetail> getPlaceID(@Query("latlng") String latlng);
 
+    @GET("api/BusStops")
+    Call<List<BusStopDB>> getAllBusStop();
+
+    @POST("api/Users")
+    Call<UserAccount> loginViaEmail(@Query("email") String email);
+
+    @POST("api/Users")
+    Call<UserAccount> loginViaEmail2(@Body JsonObject email);
 
 }
 

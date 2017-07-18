@@ -23,13 +23,16 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.andremion.counterfab.CounterFab;
-import com.example.hoanglong.bushelper.POJO.PlaceDetail;
-import com.example.hoanglong.bushelper.POJO.RouteList;
-import com.example.hoanglong.bushelper.POJO.Step;
+import com.example.hoanglong.bushelper.POJO.Beacon;
+import com.example.hoanglong.bushelper.POJO.googlemap.BusStop;
+import com.example.hoanglong.bushelper.POJO.BusStopDB;
+import com.example.hoanglong.bushelper.POJO.googlemap.PlaceDetail;
+import com.example.hoanglong.bushelper.POJO.googlemap.RouteList;
+import com.example.hoanglong.bushelper.POJO.googlemap.Step;
 import com.example.hoanglong.bushelper.api.ServerAPI;
-import com.example.hoanglong.bushelper.model.AttributedPhoto;
-import com.example.hoanglong.bushelper.model.Favorite;
-import com.example.hoanglong.bushelper.model.Location;
+import com.example.hoanglong.bushelper.POJO.AttributedPhoto;
+import com.example.hoanglong.bushelper.entities.Favorite;
+import com.example.hoanglong.bushelper.entities.Location;
 import com.example.hoanglong.bushelper.ormlite.DatabaseManager;
 import com.example.hoanglong.bushelper.utils.Utils;
 import com.github.aakira.expandablelayout.ExpandableRelativeLayout;
@@ -67,15 +70,15 @@ import rx.Observer;
 import rx.Subscriber;
 import rx.schedulers.Schedulers;
 
+//import static com.example.hoanglong.bushelper.App.busStopListFromGoogle;
+
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback, GoogleMap.OnMarkerDragListener, GoogleMap.OnMarkerClickListener {
 
     private GoogleMap mMap;
     LatLng origin;
     LatLng dest;
-    ArrayList<LatLng> MarkerPoints;
-    //    TextView showDistanceDuration;
+    ArrayList<LatLng> markerPoints;
     Polyline line;
-
     Polyline line2;
 
     android.location.Location mLocation;
@@ -92,6 +95,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     GoogleApiClient mGoogleApiClient;
 
+    private List<BusStop> busStopListFromGoogle = new ArrayList<>();
 
     @Inject
     Retrofit retrofit;
@@ -170,7 +174,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         }
 
         // Initializing
-        MarkerPoints = new ArrayList<>();
+        markerPoints = new ArrayList<>();
 
         //show error dialog if Google Play Services not available
         if (!isGooglePlayServicesAvailable()) {
@@ -223,7 +227,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         //Initialize the first stop
         final Location aBustop = getIntent().getParcelableExtra("busStop");
         LatLng busStart = new LatLng(aBustop.getLatitude(), aBustop.getLongitude());
-        MarkerPoints.add(busStart);
+        markerPoints.add(busStart);
         MarkerOptions options1 = new MarkerOptions();
         options1.position(busStart);
         options1.title(getString(R.string.final_stop));
@@ -254,20 +258,20 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
 
                 // clearing map and generating new marker points if user clicks on map
-                if (MarkerPoints.size() >= 1) {
+                if (markerPoints.size() >= 1) {
                     mMap.clear();
 
                     LatLng tmp;
-                    if (MarkerPoints.size() > 1) {
-                        tmp = MarkerPoints.get(1);
+                    if (markerPoints.size() > 1) {
+                        tmp = markerPoints.get(1);
                     } else {
-                        tmp = MarkerPoints.get(0);
+                        tmp = markerPoints.get(0);
                     }
-                    MarkerPoints.clear();
-                    MarkerPoints = new ArrayList<>();
+                    markerPoints.clear();
+                    markerPoints = new ArrayList<>();
 
                     if (isMutipleMarker) {
-                        MarkerPoints.add(tmp);
+                        markerPoints.add(tmp);
                         MarkerOptions options1 = new MarkerOptions();
                         options1.position(tmp);
                         options1.title(getString(R.string.middle_stop));
@@ -291,7 +295,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 showDistanceDuration.setText("Please choose destination");
 
                 // Adding new item to the ArrayList
-                MarkerPoints.add(point);
+                markerPoints.add(point);
 
                 // Creating MarkerOptions
                 MarkerOptions options = new MarkerOptions();
@@ -307,16 +311,16 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
                 // Checks, whether start and end locations are captured
                 if (isMutipleMarker) {
-                    if (MarkerPoints.size() >= 2) {
-                        origin = MarkerPoints.get(0);
-                        dest = MarkerPoints.get(1);
+                    if (markerPoints.size() >= 2) {
+                        origin = markerPoints.get(0);
+                        dest = markerPoints.get(1);
                     } else {
                         origin = myLocation;
-                        dest = MarkerPoints.get(0);
+                        dest = markerPoints.get(0);
                     }
                 } else {
                     origin = myLocation;
-                    dest = MarkerPoints.get(0);
+                    dest = markerPoints.get(0);
                 }
 
 
@@ -329,6 +333,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             public void onClick(View v) {
 
                 if (!checkMultipleClick) {
+                    busStopListFromGoogle.clear();
                     from_my_location("transit", myLocation, origin);
                     from_my_location("transit", origin, dest);
                     checkMultipleClick = true;
@@ -361,13 +366,13 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                 if (response.body().getRoutes().size() == 0) {
                                     origin = myLocation;
                                     dest = myLocation;
-                                    if (MarkerPoints.size() == 2) {
-//                                        origin = MarkerPoints.get(1, origin);
+                                    if (markerPoints.size() == 2) {
+//                                        origin = markerPoints.get(1, origin);
                                         dest = origin;
-                                        MarkerPoints.set(1, dest);
+                                        markerPoints.set(1, dest);
 
                                     } else {
-                                        MarkerPoints.set(0, origin);
+                                        markerPoints.set(0, origin);
 
                                     }
                                     Toast.makeText(getBaseContext(), R.string.no_route, Toast.LENGTH_SHORT).show();
@@ -431,13 +436,16 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
                                         observable.subscribeOn(Schedulers.io()).subscribe(observer);
 
+                                        BusStop aBusStop = new BusStop();
 
                                         for (Step tmp : instruction) {
                                             if (tmp.getTransit_detail() != null) {
-
                                                 textInstruction += "\t• Get bus number \"" + tmp.getTransit_detail().getLine().getBusName() + "\"\n";
                                                 textInstruction += "    - From " + tmp.getTransit_detail().getDeparture_stop().getStopName() + "\n";
                                                 textInstruction += "    - To " + tmp.getTransit_detail().getArrival_stop().getStopName() + "\n";
+
+                                                aBusStop.setStopName(tmp.getTransit_detail().getArrival_stop().getStopName());
+                                                aBusStop.setLocation(tmp.getTransit_detail().getArrival_stop().getLocation());
 
                                             } else {
                                                 textInstruction += "\t• " + tmp.getInstruction() + "\n";
@@ -445,6 +453,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
 
                                         }
+
+                                        busStopListFromGoogle.add(aBusStop);
 //                                    String instruction="";
                                         Integer distance = response.body().getRoutes().get(i).getLegs().get(i).getDistance().getValue();
                                         Integer time = response.body().getRoutes().get(i).getLegs().get(i).getDuration().getValue();
@@ -494,6 +504,19 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
 
                                 tvInstruction.setText(textInstruction);
+                                for (BusStopDB tmp : ((App) getApplication()).getBusStopListFromDB()) {
+                                    BusStop aBusStop = busStopListFromGoogle.get(busStopListFromGoogle.size() - 1);
+                                    double lat = Double.parseDouble(aBusStop.getLocation().getLatitude());
+                                    double lng = Double.parseDouble(aBusStop.getLocation().getLongitude());
+                                    if (Utils.almostEqual(tmp.getLatitude(), lat, 0.001) && Utils.almostEqual(tmp.getLongitude(), lng, 0.001)) {
+                                        Beacon aBeacon = new Beacon();
+                                        aBeacon.setUuid(tmp.getBeaconList().get(0).getBeacon().getUuid());
+                                        aBeacon.setMajor(tmp.getBeaconList().get(0).getBeacon().getMajor());
+                                        aBeacon.setMinor(tmp.getBeaconList().get(0).getBeacon().getMinor());
+                                        ((App) getApplication()).addBeaconToBeMonitered(aBeacon, tmp);
+                                        Toast.makeText(getBaseContext(), aBusStop.getStopName(), Toast.LENGTH_SHORT).show();
+                                    }
+                                }
 
                             } catch (Exception e) {
                                 Log.d("onResponse", "There is an error");
@@ -507,6 +530,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         }
                     });
         }
+
 
     }
 
@@ -570,15 +594,15 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     @Override
     public void onMarkerDragEnd(Marker marker) {
-        if (MarkerPoints.size() == 2) {
+        if (markerPoints.size() == 2) {
             if (marker.getTitle().equals(getString(R.string.middle_stop))) {
                 origin = marker.getPosition();
-                MarkerPoints.set(0, origin);
+                markerPoints.set(0, origin);
             }
 
             if (marker.getTitle().equals(getString(R.string.final_stop))) {
                 dest = marker.getPosition();
-                MarkerPoints.set(1, dest);
+                markerPoints.set(1, dest);
 
             }
 
@@ -594,7 +618,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             if (marker.getTitle().equals(getString(R.string.final_stop))) {
                 dest = marker.getPosition();
                 origin = myLocation;
-                MarkerPoints.set(0, dest);
+                markerPoints.set(0, dest);
 
             }
 
@@ -681,20 +705,18 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
                             case R.id.removeMarker:
                                 if (!marker.getTitle().equals(getString(R.string.your_location))) {
-                                    if (MarkerPoints.size() == 2) {
+                                    if (markerPoints.size() == 2) {
                                         if (marker.getTitle().equals(getString(R.string.middle_stop))) {
                                             origin = myLocation;
-                                            MarkerPoints.set(0, origin);
+                                            markerPoints.set(0, origin);
                                         }
 
                                         if (marker.getTitle().equals(getString(R.string.final_stop))) {
-//                                        dest = myLocation;
-//                                        MarkerPoints.set(1, dest);
 
-                                            dest = MarkerPoints.get(0);
+                                            dest = markerPoints.get(0);
                                             origin = myLocation;
-                                            MarkerPoints.remove(1);
-                                            MarkerPoints.set(0, dest);
+                                            markerPoints.remove(1);
+                                            markerPoints.set(0, dest);
 
                                             mMap.clear();
 
@@ -730,7 +752,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                         if (marker.getTitle().equals(getString(R.string.final_stop))) {
                                             dest = myLocation;
                                             origin = myLocation;
-                                            MarkerPoints.set(0, dest);
+                                            markerPoints.set(0, dest);
 
                                         }
 
@@ -764,7 +786,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
             }
         });
-
 
         return false;
     }

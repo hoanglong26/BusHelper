@@ -1,4 +1,4 @@
-package com.example.hoanglong.bushelper.model;
+package com.example.hoanglong.bushelper.POJO;
 
 /**
  * Created by hoanglong on 26-Jun-17.

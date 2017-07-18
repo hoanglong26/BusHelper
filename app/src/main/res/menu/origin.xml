@@ -3,6 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <item
+        android:id="@+id/userDisplay"
         android:title="@string/user"
         app:actionLayout="@layout/menu_top"
         app:showAsAction="always"

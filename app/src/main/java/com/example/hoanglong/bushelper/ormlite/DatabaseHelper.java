@@ -5,8 +5,8 @@ import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 
-import com.example.hoanglong.bushelper.model.Favorite;
-import com.example.hoanglong.bushelper.model.Location;
+import com.example.hoanglong.bushelper.entities.Favorite;
+import com.example.hoanglong.bushelper.entities.Location;
 import com.j256.ormlite.android.apptools.OrmLiteSqliteOpenHelper;
 import com.j256.ormlite.dao.Dao;
 import com.j256.ormlite.support.ConnectionSource;

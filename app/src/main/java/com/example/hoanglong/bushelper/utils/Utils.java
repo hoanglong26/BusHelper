@@ -14,14 +14,15 @@ import android.os.Build;
 import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
-import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.content.ContextCompat;
 import android.text.TextUtils;
 import android.util.Base64;
 
+import com.example.hoanglong.bushelper.POJO.AttributedPhoto;
 import com.example.hoanglong.bushelper.R;
-import com.example.hoanglong.bushelper.model.AttributedPhoto;
+import com.google.android.gms.auth.api.Auth;
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.places.PlacePhotoMetadata;
@@ -51,9 +52,7 @@ public class Utils {
                 != PackageManager.PERMISSION_GRANTED) {
 
             // Asking user if explanation is needed
-            if (ActivityCompat.shouldShowRequestPermissionRationale(activity,
-                    android.Manifest.permission.ACCESS_FINE_LOCATION)) {
-
+            if (ActivityCompat.shouldShowRequestPermissionRationale(activity, android.Manifest.permission.ACCESS_FINE_LOCATION)) {
 
                 //Prompt the user once explanation has been shown
                 ActivityCompat.requestPermissions(activity,
@@ -95,6 +94,9 @@ public class Utils {
     }
 
     public static void initialGoogleApiClient(FragmentActivity context) {
+        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                .requestEmail()
+                .build();
         mGoogleApiClient = new GoogleApiClient
                 .Builder(context)
                 .enableAutoManage(context, 0, new GoogleApiClient.OnConnectionFailedListener() {
@@ -105,11 +107,12 @@ public class Utils {
                 })
                 .addApi(Places.GEO_DATA_API)
                 .addApi(Places.PLACE_DETECTION_API)
+                .addApi(Auth.GOOGLE_SIGN_IN_API, gso)
                 .build();
     }
 
 
-    public static GoogleApiClient getGoogleApiClient(){
+    public static GoogleApiClient getGoogleApiClient() {
         return mGoogleApiClient;
     }
 
@@ -119,17 +122,17 @@ public class Utils {
         return new LatLngBounds(southwest, northeast);
     }
 
-    public static AttributedPhoto getAttributedPhoto( String placeId){
+    public static AttributedPhoto getAttributedPhoto(String placeId) {
 //        placeId="ChIJIcu5wc4tdTERJxL9vPGDacc";
 
-        AttributedPhoto attributedPhoto = new AttributedPhoto(null,null);
+        AttributedPhoto attributedPhoto = new AttributedPhoto(null, null);
 
         PlacePhotoMetadataResult result = Places.GeoDataApi
                 .getPlacePhotos(mGoogleApiClient, placeId).await(10, TimeUnit.SECONDS);
 
         if (result.getStatus().isSuccess()) {
             PlacePhotoMetadataBuffer photoMetadataBuffer = result.getPhotoMetadata();
-            if (photoMetadataBuffer.getCount() > 0 ) {
+            if (photoMetadataBuffer.getCount() > 0) {
                 // Get the first bitmap and its attributions.
                 PlacePhotoMetadata photo = photoMetadataBuffer.get(0);
                 CharSequence attribution = photo.getAttributions();
@@ -187,7 +190,7 @@ public class Utils {
         int locationMode = 0;
         String locationProviders;
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT){
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
             try {
                 locationMode = Settings.Secure.getInt(context.getContentResolver(), Settings.Secure.LOCATION_MODE);
 
@@ -198,7 +201,7 @@ public class Utils {
 
             return locationMode != Settings.Secure.LOCATION_MODE_OFF;
 
-        }else{
+        } else {
             locationProviders = Settings.Secure.getString(context.getContentResolver(), Settings.Secure.LOCATION_PROVIDERS_ALLOWED);
             return !TextUtils.isEmpty(locationProviders);
         }
@@ -230,5 +233,9 @@ public class Utils {
                 );
         AlertDialog alert = builder.create();
         alert.show();
+    }
+
+    public static boolean almostEqual(double a, double b, double eps) {
+        return Math.abs(a - b) < eps;
     }
 }

@@ -2,6 +2,7 @@ package com.example.hoanglong.bushelper;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.database.MatrixCursor;
@@ -9,6 +10,7 @@ import android.graphics.Typeface;
 import android.location.LocationManager;
 import android.os.Build;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.provider.BaseColumns;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
@@ -30,12 +32,17 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
-import com.example.hoanglong.bushelper.model.Location;
-import com.example.hoanglong.bushelper.model.PlacePrediction;
+import com.bumptech.glide.Glide;
+import com.example.hoanglong.bushelper.POJO.EmailInfo;
+import com.example.hoanglong.bushelper.entities.Location;
+import com.example.hoanglong.bushelper.POJO.PlacePrediction;
 import com.example.hoanglong.bushelper.ormlite.DatabaseManager;
 import com.example.hoanglong.bushelper.utils.Utils;
+import com.google.android.gms.auth.api.Auth;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.PendingResult;
 import com.google.android.gms.common.api.ResultCallback;
@@ -47,17 +54,20 @@ import com.google.android.gms.location.places.PlaceBuffer;
 import com.google.android.gms.location.places.Places;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
-import org.junit.runner.RunWith;
 
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import de.hdodenhof.circleimageview.CircleImageView;
 import rx.Observable;
 import rx.Observer;
 import rx.Subscriber;
@@ -80,6 +90,7 @@ public class MainActivity extends AppCompatActivity {
 
     @BindView(R.id.searchBtn)
     Button searchBtn;
+
 
 
     FragmentPagerAdapter adapterViewPager;
@@ -112,10 +123,6 @@ public class MainActivity extends AppCompatActivity {
 
         getSupportActionBar().setElevation(0);
         DatabaseManager.init(getBaseContext());
-
-
-//        DatabaseManager.getInstance().deleteAllLocations();
-
 
         Utils.initialGoogleApiClient(this);
         mGoogleApiClient = Utils.getGoogleApiClient();
@@ -156,17 +163,23 @@ public class MainActivity extends AppCompatActivity {
                 if(!Utils.isLocationEnabled(MainActivity.this)){
                     Utils.createLocationErrorDialog(MainActivity.this);
                 }
-                Intent intent = new Intent(getBaseContext(), MapsActivity.class);
-                if (result != null) {
-                    Toast.makeText(getBaseContext(), "Starting Map", Toast.LENGTH_SHORT).show();
 
-                    intent.putExtra("busStop", result);
-                    startActivity(intent);
-                    finish();
-                } else {
-                    Toast.makeText(getBaseContext(), R.string.please_choose_location, Toast.LENGTH_SHORT).show();
+                if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                    if(Utils.checkLocationPermission(MainActivity.this)){
+                        Intent intent = new Intent(getBaseContext(), MapsActivity.class);
+                        if (result != null) {
+                            Toast.makeText(getBaseContext(), "Starting Map", Toast.LENGTH_SHORT).show();
 
+                            intent.putExtra("busStop", result);
+                            startActivity(intent);
+                            finish();
+                        } else {
+                            Toast.makeText(getBaseContext(), R.string.please_choose_location, Toast.LENGTH_SHORT).show();
+
+                        }
+                    }
                 }
+
                 return true;
             }
 
@@ -219,17 +232,25 @@ public class MainActivity extends AppCompatActivity {
                     Utils.createLocationErrorDialog(MainActivity.this);
                 }
 
-                if (ActivityCompat.checkSelfPermission(getBaseContext(), android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getBaseContext(), android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-                    return;
+
+
+                if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                    if(Utils.checkLocationPermission(MainActivity.this)){
+
+                        mLocation = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+                        result = new Location(0, "My location", mLocation.getLatitude(), mLocation.getLongitude());
+                        Intent intent = new Intent(getBaseContext(), MapsActivity.class);
+                        intent.putExtra("busStop", result);
+                        startActivity(intent);
+                        finish();
+                    }
                 }
 
+//                if (ActivityCompat.checkSelfPermission(getBaseContext(), android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getBaseContext(), android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+//                    return;
+//                }
 
-                mLocation = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
-                result = new Location(0, "My location", mLocation.getLatitude(), mLocation.getLongitude());
-                Intent intent = new Intent(getBaseContext(), MapsActivity.class);
-                intent.putExtra("busStop", result);
-                startActivity(intent);
-                finish();
+
 
             }
         });
@@ -298,6 +319,9 @@ public class MainActivity extends AppCompatActivity {
         if(!Utils.isLocationEnabled(MainActivity.this)){
             Utils.createLocationErrorDialog(MainActivity.this);
         }
+
+
+
     }
 
 
@@ -391,31 +415,59 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-//        getMenuInflater().inflate(R.menu.origin, menu);
-////        try {
-////            Field[] fields = menu.getClass().getDeclaredFields();
-////            for (Field field : fields) {
-////                if ("mPopup".equals(field.getName())) {
-////                    field.setAccessible(true);
-////                    Object menuPopupHelper = field.get(menu);
-////                    Class<?> classPopupHelper = Class.forName(menuPopupHelper.getClass().getName());
-////                    Method setForceIcons = classPopupHelper.getMethod("setForceShowIcon", boolean.class);
-////                    setForceIcons.invoke(menuPopupHelper, true);
-////                    break;
-////                }
-////            }
-////        } catch (Exception e) {
-////            e.printStackTrace();
-////        }
-//
-//        menu.getItem(0).setIcon(R.drawable.ic_power_settings_new_black_24dp);
         getMenuInflater().inflate(R.menu.origin, menu);
+
+
+        Gson gson = new Gson();
+        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
+        String jsonPatients = sharedPref.getString("userAccount", "");
+
+        if(!jsonPatients.equals("")){
+            Type type = new TypeToken<EmailInfo>() {
+            }.getType();
+            EmailInfo account = gson.fromJson(jsonPatients, type);
+
+            MenuItem item1 = menu.findItem(R.id.userDisplay);
+            //Here, you get access to the view of your item, in this case, the layout of the item has a FrameLayout as root view but you can change it to whatever you use
+            LinearLayout rootView = (LinearLayout) item1.getActionView();
+            TextView username = (TextView) rootView.findViewById(R.id.username);
+            username.setText(account.getName());
+            CircleImageView cvImg = (CircleImageView) rootView.findViewById(R.id.profile_image);
+            Glide.with(this).load(account.getAvatarUrl()).into(cvImg);
+        }
+
 
         MenuItem item = menu.findItem(R.id.action_logout);
         SpannableStringBuilder builder = new SpannableStringBuilder("*  Logout");
         // replace "*" with icon
         builder.setSpan(new ImageSpan(this, R.drawable.ic_power_settings_new_black_24dp), 0, 1, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
         item.setTitle(builder);
+        item.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem menuItem) {
+                Auth.GoogleSignInApi.signOut(mGoogleApiClient).setResultCallback(
+                        new ResultCallback<Status>() {
+                            @Override
+                            public void onResult(Status status) {
+
+                                SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
+
+
+                                //Remove all info of current account
+                                SharedPreferences.Editor editor = sharedPref.edit();
+                                editor.putString("userToken", "");
+                                editor.putString("userID", "");
+
+                                editor.commit();
+
+
+                                Intent intent = new Intent(getBaseContext(), LoginActivity.class);
+                                startActivity(intent);
+                            }
+                        });
+                return false;
+            }
+        });
         return super.onCreateOptionsMenu(menu);
     }
 

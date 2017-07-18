@@ -2,7 +2,6 @@ package com.example.hoanglong.bushelper;
 
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -10,7 +9,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.example.hoanglong.bushelper.model.Location;
+import com.example.hoanglong.bushelper.entities.Location;
 import com.example.hoanglong.bushelper.ormlite.DatabaseManager;
 import com.mikepenz.fastadapter.FastAdapter;
 import com.mikepenz.fastadapter.IAdapter;
@@ -18,7 +17,6 @@ import com.mikepenz.fastadapter.commons.adapters.FastItemAdapter;
 
 import org.greenrobot.eventbus.EventBus;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.BindView;

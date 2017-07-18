@@ -1,4 +1,4 @@
-package com.example.hoanglong.bushelper.POJO;
+package com.example.hoanglong.bushelper.POJO.googlemap;
 
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
