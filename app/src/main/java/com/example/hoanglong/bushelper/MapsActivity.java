@@ -23,14 +23,13 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.andremion.counterfab.CounterFab;
-import com.example.hoanglong.bushelper.POJO.Beacon;
+import com.example.hoanglong.bushelper.POJO.AttributedPhoto;
 import com.example.hoanglong.bushelper.POJO.googlemap.BusStop;
-import com.example.hoanglong.bushelper.POJO.BusStopDB;
 import com.example.hoanglong.bushelper.POJO.googlemap.PlaceDetail;
 import com.example.hoanglong.bushelper.POJO.googlemap.RouteList;
 import com.example.hoanglong.bushelper.POJO.googlemap.Step;
+import com.example.hoanglong.bushelper.api.RetrofitUtils;
 import com.example.hoanglong.bushelper.api.ServerAPI;
-import com.example.hoanglong.bushelper.POJO.AttributedPhoto;
 import com.example.hoanglong.bushelper.entities.Favorite;
 import com.example.hoanglong.bushelper.entities.Location;
 import com.example.hoanglong.bushelper.ormlite.DatabaseManager;
@@ -120,8 +119,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     String textInstruction;
 
-    boolean isMutipleMarker = false;
-
+    boolean isMultipleMarker = false;
 
     @Override
     protected void onStart() {
@@ -153,11 +151,20 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             public void onClick(View view) {
                 if (btnAdd.getCount() == 1) {
                     btnAdd.setCount(2);
-                    isMutipleMarker = true;
+                    isMultipleMarker = true;
                 } else {
                     btnAdd.setCount(1);
-                    isMutipleMarker = false;
+                    isMultipleMarker = false;
                 }
+            }
+        });
+
+        btnAdd.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View view) {
+                btnAdd.setCount(1);
+                isMultipleMarker = false;
+                return false;
             }
         });
 
@@ -191,14 +198,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         expandableLayout1.toggle();
-
-
     }
 
     @OnClick(R.id.expandableButton1)
     public void onClick1() {
         expandableLayout1.toggle();
-
     }
 
     @Override
@@ -211,7 +215,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         mMap.getUiSettings().setRotateGesturesEnabled(true);
         mMap.getUiSettings().setCompassEnabled(true);
 
-
         //Setup to get location
         if (ActivityCompat.checkSelfPermission(getBaseContext(), android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getBaseContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             return;
@@ -222,7 +225,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         mMap.addMarker(new MarkerOptions().position(myLocation).title(getString(R.string.your_location)));
         mMap.moveCamera(CameraUpdateFactory.newLatLng(myLocation));
         mMap.animateCamera(CameraUpdateFactory.zoomTo(14));
-
 
         //Initialize the first stop
         final Location aBustop = getIntent().getParcelableExtra("busStop");
@@ -256,7 +258,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 checkMultipleClick = false;
                 slidingPaneLayout.setPanelState(SlidingUpPanelLayout.PanelState.COLLAPSED);
 
-
                 // clearing map and generating new marker points if user clicks on map
                 if (markerPoints.size() >= 1) {
                     mMap.clear();
@@ -270,7 +271,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     markerPoints.clear();
                     markerPoints = new ArrayList<>();
 
-                    if (isMutipleMarker) {
+                    if (isMultipleMarker) {
                         markerPoints.add(tmp);
                         MarkerOptions options1 = new MarkerOptions();
                         options1.position(tmp);
@@ -289,7 +290,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     totalTime = 0;
                     totalDistance = 0;
                     textInstruction = "";
-
                 }
 
                 showDistanceDuration.setText("Please choose destination");
@@ -310,7 +310,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 mMap.addMarker(options);
 
                 // Checks, whether start and end locations are captured
-                if (isMutipleMarker) {
+                if (isMultipleMarker) {
                     if (markerPoints.size() >= 2) {
                         origin = markerPoints.get(0);
                         dest = markerPoints.get(1);
@@ -322,8 +322,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     origin = myLocation;
                     dest = markerPoints.get(0);
                 }
-
-
             }
         });
 
@@ -331,14 +329,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         btnGo.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
                 if (!checkMultipleClick) {
                     busStopListFromGoogle.clear();
                     from_my_location("transit", myLocation, origin);
                     from_my_location("transit", origin, dest);
                     checkMultipleClick = true;
-
-
                 }
 
             }
@@ -346,10 +341,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     }
 
     private void from_my_location(String type, final LatLng from, LatLng to) {
-
         if (myLocation != null) {
-//            serverAPI = RetrofitUtils.get().create(ServerAPI.class);
-
+            serverAPI = RetrofitUtils.get().create(ServerAPI.class);
             serverAPI = retrofit.create(ServerAPI.class);
 
             serverAPI.getDistanceDuration("metric", from.latitude + "," + from.longitude, to.latitude + "," + to.longitude, type)
@@ -362,7 +355,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                     line.remove();
                                 }
 
-
                                 if (response.body().getRoutes().size() == 0) {
                                     origin = myLocation;
                                     dest = myLocation;
@@ -370,27 +362,21 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 //                                        origin = markerPoints.get(1, origin);
                                         dest = origin;
                                         markerPoints.set(1, dest);
-
                                     } else {
                                         markerPoints.set(0, origin);
-
                                     }
                                     Toast.makeText(getBaseContext(), R.string.no_route, Toast.LENGTH_SHORT).show();
                                 } else {
                                     for (int i = 0; i < response.body().getRoutes().size(); i++) {
                                         List<Step> instruction = response.body().getRoutes().get(i).getLegs().get(i).getSteps();
 
-
                                         final int finalI = i;
 
                                         Observable<AttributedPhoto> observable = Observable.create(new Observable.OnSubscribe<AttributedPhoto>() {
                                             @Override
                                             public void call(Subscriber<? super AttributedPhoto> subscriber) {
-
                                                 subscriber.onNext(Utils.getAttributedPhoto(response.body().getGeocodedWaypoints().get(finalI).getPlace_id()));
                                                 subscriber.onCompleted();
-
-
                                             }
                                         });
 
@@ -446,22 +432,18 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
                                                 aBusStop.setStopName(tmp.getTransit_detail().getArrival_stop().getStopName());
                                                 aBusStop.setLocation(tmp.getTransit_detail().getArrival_stop().getLocation());
-
                                             } else {
                                                 textInstruction += "\t• " + tmp.getInstruction() + "\n";
                                             }
-
-
                                         }
 
                                         busStopListFromGoogle.add(aBusStop);
-//                                    String instruction="";
+//                                        String instruction = "";
                                         Integer distance = response.body().getRoutes().get(i).getLegs().get(i).getDistance().getValue();
                                         Integer time = response.body().getRoutes().get(i).getLegs().get(i).getDuration().getValue();
                                         totalTime += time;
                                         totalDistance += distance;
-//                                    textInstruction += instruction;
-
+//                                        textInstruction += instruction;
 
                                         if (totalDistance / 1000 <= 0 && totalTime / 60 <= 0) {
                                             showDistanceDuration.setText("Distance: " + totalDistance + " m, Duration: " + totalTime + " secs");
@@ -481,7 +463,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                         }
 
                                         String encodedString = response.body().getRoutes().get(0).getOverviewPolyline().getPoints();
-                                        List<LatLng> list = decodePoly(encodedString);
+                                        List<LatLng> list = Utils.decodePoly(encodedString);
 
                                         if (from != myLocation) {
                                             line = mMap.addPolyline(new PolylineOptions()
@@ -502,22 +484,21 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                     }
                                 }
 
-
                                 tvInstruction.setText(textInstruction);
-                                for (BusStopDB tmp : ((App) getApplication()).getBusStopListFromDB()) {
-                                    BusStop aBusStop = busStopListFromGoogle.get(busStopListFromGoogle.size() - 1);
-                                    double lat = Double.parseDouble(aBusStop.getLocation().getLatitude());
-                                    double lng = Double.parseDouble(aBusStop.getLocation().getLongitude());
-                                    if (Utils.almostEqual(tmp.getLatitude(), lat, 0.001) && Utils.almostEqual(tmp.getLongitude(), lng, 0.001)) {
-                                        Beacon aBeacon = new Beacon();
-                                        aBeacon.setUuid(tmp.getBeaconList().get(0).getBeacon().getUuid());
-                                        aBeacon.setMajor(tmp.getBeaconList().get(0).getBeacon().getMajor());
-                                        aBeacon.setMinor(tmp.getBeaconList().get(0).getBeacon().getMinor());
-                                        ((App) getApplication()).addBeaconToBeMonitered(aBeacon, tmp);
-                                        Toast.makeText(getBaseContext(), aBusStop.getStopName(), Toast.LENGTH_SHORT).show();
-                                    }
-                                }
 
+//                                for (BusStopDB tmp : ((App) getApplication()).getBusStopListFromDB()) {
+//                                    BusStop aBusStop = busStopListFromGoogle.get(busStopListFromGoogle.size() - 1);
+//                                    double lat = Double.parseDouble(aBusStop.getLocation().getLatitude());
+//                                    double lng = Double.parseDouble(aBusStop.getLocation().getLongitude());
+//                                    if (Utils.almostEqual(tmp.getLatitude(), lat, 0.001) && Utils.almostEqual(tmp.getLongitude(), lng, 0.001)) {
+//                                        Beacon aBeacon = new Beacon();
+//                                        aBeacon.setUuid(tmp.getBeaconList().get(0).getBeacon().getUuid());
+//                                        aBeacon.setMajor(tmp.getBeaconList().get(0).getBeacon().getMajor());
+//                                        aBeacon.setMinor(tmp.getBeaconList().get(0).getBeacon().getMinor());
+//                                        ((App) getApplication()).addBeaconToBeMonitered(aBeacon, tmp);
+//                                        Toast.makeText(getBaseContext(), aBusStop.getStopName(), Toast.LENGTH_SHORT).show();
+//                                    }
+//                                }
                             } catch (Exception e) {
                                 Log.d("onResponse", "There is an error");
                                 e.printStackTrace();
@@ -530,42 +511,40 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         }
                     });
         }
-
-
     }
 
-    private List<LatLng> decodePoly(String encoded) {
-        List<LatLng> poly = new ArrayList<LatLng>();
-        int index = 0, len = encoded.length();
-        int lat = 0, lng = 0;
-
-        while (index < len) {
-            int b, shift = 0, result = 0;
-            do {
-                b = encoded.charAt(index++) - 63;
-                result |= (b & 0x1f) << shift;
-                shift += 5;
-            } while (b >= 0x20);
-            int dlat = ((result & 1) != 0 ? ~(result >> 1) : (result >> 1));
-            lat += dlat;
-
-            shift = 0;
-            result = 0;
-            do {
-                b = encoded.charAt(index++) - 63;
-                result |= (b & 0x1f) << shift;
-                shift += 5;
-            } while (b >= 0x20);
-            int dlng = ((result & 1) != 0 ? ~(result >> 1) : (result >> 1));
-            lng += dlng;
-
-            LatLng p = new LatLng((((double) lat / 1E5)),
-                    (((double) lng / 1E5)));
-            poly.add(p);
-        }
-
-        return poly;
-    }
+//    private List<LatLng> decodePoly(String encoded) {
+//        List<LatLng> poly = new ArrayList<LatLng>();
+//        int index = 0, len = encoded.length();
+//        int lat = 0, lng = 0;
+//
+//        while (index < len) {
+//            int b, shift = 0, result = 0;
+//            do {
+//                b = encoded.charAt(index++) - 63;
+//                result |= (b & 0x1f) << shift;
+//                shift += 5;
+//            } while (b >= 0x20);
+//            int dlat = ((result & 1) != 0 ? ~(result >> 1) : (result >> 1));
+//            lat += dlat;
+//
+//            shift = 0;
+//            result = 0;
+//            do {
+//                b = encoded.charAt(index++) - 63;
+//                result |= (b & 0x1f) << shift;
+//                shift += 5;
+//            } while (b >= 0x20);
+//            int dlng = ((result & 1) != 0 ? ~(result >> 1) : (result >> 1));
+//            lng += dlng;
+//
+//            LatLng p = new LatLng((((double) lat / 1E5)),
+//                    (((double) lng / 1E5)));
+//            poly.add(p);
+//        }
+//
+//        return poly;
+//    }
 
     // Checking if Google Play Services Available or not
     private boolean isGooglePlayServicesAvailable() {
@@ -644,16 +623,13 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     @Override
     public boolean onMarkerClick(final Marker marker) {
-
         serverAPI = retrofit.create(ServerAPI.class);
-
 
         serverAPI.getPlaceID(marker.getPosition().latitude + "," + marker.getPosition().longitude).enqueue(new Callback<PlaceDetail>() {
             @Override
             public void onResponse(Call<PlaceDetail> call, Response<PlaceDetail> response) {
-                String place_id = response.body().getAddr_comp().get(0).getPlace_id();
+//                String place_id = response.body().getAddr_comp().get(0).getPlace_id();
                 final String addr = response.body().getAddr_comp().get(0).getAddress();
-
 
                 PopupMenu popup = new PopupMenu(MapsActivity.this, expandableLayout1);
 
@@ -712,7 +688,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                         }
 
                                         if (marker.getTitle().equals(getString(R.string.final_stop))) {
-
                                             dest = markerPoints.get(0);
                                             origin = myLocation;
                                             markerPoints.remove(1);
@@ -720,26 +695,21 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
                                             mMap.clear();
 
-
                                             MarkerOptions options2 = new MarkerOptions();
                                             options2.position(dest);
                                             options2.title(getString(R.string.final_stop));
                                             options2.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_YELLOW));
                                             mMap.addMarker(options2);
 
-
                                             MarkerOptions options = new MarkerOptions();
                                             options.position(myLocation);
                                             options.title(getString(R.string.your_location));
                                             options.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED));
                                             mMap.addMarker(options);
-
-
                                         }
 
                                         if (line != null) {
                                             line.remove();
-
                                         }
 
                                         if (line2 != null) {
@@ -747,13 +717,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                         }
 
                                         btnAdd.setCount(1);
-                                        isMutipleMarker = false;
+                                        isMultipleMarker = false;
                                     } else {
                                         if (marker.getTitle().equals(getString(R.string.final_stop))) {
                                             dest = myLocation;
                                             origin = myLocation;
                                             markerPoints.set(0, dest);
-
                                         }
 
                                         if (line2 != null) {
@@ -770,7 +739,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                     Toast.makeText(getBaseContext(), R.string.cannot_remove_marker, Toast.LENGTH_SHORT).show();
 
                                 }
-
                                 break;
                         }
 
@@ -789,6 +757,4 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         return false;
     }
-
-
 }

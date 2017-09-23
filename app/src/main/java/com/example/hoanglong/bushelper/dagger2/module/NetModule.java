@@ -26,7 +26,6 @@ public class NetModule {
         this.mBaseUrl = mBaseUrl;
     }
 
-
     @Provides
     @Singleton
     Cache provideHttpCache(Application application) {

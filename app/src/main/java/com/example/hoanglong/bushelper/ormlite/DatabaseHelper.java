@@ -32,10 +32,7 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
 
     private Dao<Favorite, Integer> favoriteDao = null;
 
-
     public DatabaseHelper(Context context) {
-
-
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
     }
 
@@ -51,7 +48,6 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
         } catch (java.sql.SQLException e) {
             e.printStackTrace();
         }
-
     }
 
     @Override
@@ -71,7 +67,6 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
             Log.e(DatabaseHelper.class.getName(), "exception during onUpgrade", e);
             throw new RuntimeException(e);
         }
-
     }
 
     public Dao<Location, Integer> getLocationDao() {

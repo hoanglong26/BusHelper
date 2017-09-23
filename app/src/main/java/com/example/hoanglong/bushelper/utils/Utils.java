@@ -34,6 +34,8 @@ import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.maps.android.SphericalUtil;
 
 import java.io.ByteArrayOutputStream;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -42,7 +44,6 @@ import java.util.concurrent.TimeUnit;
 
 public class Utils {
     public static GoogleApiClient mGoogleApiClient;
-
 
     public static final int MY_PERMISSIONS_REQUEST_LOCATION = 99;
 
@@ -53,13 +54,10 @@ public class Utils {
 
             // Asking user if explanation is needed
             if (ActivityCompat.shouldShowRequestPermissionRationale(activity, android.Manifest.permission.ACCESS_FINE_LOCATION)) {
-
                 //Prompt the user once explanation has been shown
                 ActivityCompat.requestPermissions(activity,
                         new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION},
                         MY_PERMISSIONS_REQUEST_LOCATION);
-
-
             } else {
                 // No explanation needed, we can request the permission.
                 ActivityCompat.requestPermissions(activity,
@@ -71,7 +69,6 @@ public class Utils {
             return true;
         }
     }
-
 
     public static Bitmap StringToBitMap(String encodedString) {
         try {
@@ -117,14 +114,16 @@ public class Utils {
     }
 
     public static LatLngBounds toBounds(LatLng center, double radius) {
-        LatLng southwest = SphericalUtil.computeOffset(center, radius * Math.sqrt(2.0), 225);
-        LatLng northeast = SphericalUtil.computeOffset(center, radius * Math.sqrt(2.0), 45);
-        return new LatLngBounds(southwest, northeast);
+        if (center != null && radius > 0) {
+            LatLng southwest = SphericalUtil.computeOffset(center, radius * Math.sqrt(2.0), 225);
+            LatLng northeast = SphericalUtil.computeOffset(center, radius * Math.sqrt(2.0), 45);
+            return new LatLngBounds(southwest, northeast);
+        }
+        return null;
     }
 
     public static AttributedPhoto getAttributedPhoto(String placeId) {
 //        placeId="ChIJIcu5wc4tdTERJxL9vPGDacc";
-
         AttributedPhoto attributedPhoto = new AttributedPhoto(null, null);
 
         PlacePhotoMetadataResult result = Places.GeoDataApi
@@ -205,13 +204,10 @@ public class Utils {
             locationProviders = Settings.Secure.getString(context.getContentResolver(), Settings.Secure.LOCATION_PROVIDERS_ALLOWED);
             return !TextUtils.isEmpty(locationProviders);
         }
-
-
     }
 
 
     public static void createLocationErrorDialog(final Activity activity) {
-
         AlertDialog.Builder builder = new AlertDialog.Builder(activity, R.style.AlertDialogCustom);
         builder.setMessage("You need location service to use this application. Please turn it on in Settings.")
                 .setTitle("Unable to start location service")
@@ -237,5 +233,38 @@ public class Utils {
 
     public static boolean almostEqual(double a, double b, double eps) {
         return Math.abs(a - b) < eps;
+    }
+
+    public static List<LatLng> decodePoly(String encoded) {
+        List<LatLng> poly = new ArrayList<LatLng>();
+        int index = 0, len = encoded.length();
+        int lat = 0, lng = 0;
+
+        while (index < len) {
+            int b, shift = 0, result = 0;
+            do {
+                b = encoded.charAt(index++) - 63;
+                result |= (b & 0x1f) << shift;
+                shift += 5;
+            } while (b >= 0x20);
+            int dlat = ((result & 1) != 0 ? ~(result >> 1) : (result >> 1));
+            lat += dlat;
+
+            shift = 0;
+            result = 0;
+            do {
+                b = encoded.charAt(index++) - 63;
+                result |= (b & 0x1f) << shift;
+                shift += 5;
+            } while (b >= 0x20);
+            int dlng = ((result & 1) != 0 ? ~(result >> 1) : (result >> 1));
+            lng += dlng;
+
+            LatLng p = new LatLng((((double) lat / 1E5)),
+                    (((double) lng / 1E5)));
+            poly.add(p);
+        }
+
+        return poly;
     }
 }

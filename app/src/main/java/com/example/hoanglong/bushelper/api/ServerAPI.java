@@ -23,18 +23,17 @@ public interface ServerAPI {
     @GET("api/directions/json?key=AIzaSyAl_-UNqx3oY3vVPB21ieVHaGeenes2Hb8&transit_mode=bus&transit_routing_preference=less_walking")
     Call<RouteList> getDistanceDuration(@Query("units") String units, @Query("origin") String origin, @Query("destination") String destination, @Query("mode") String mode);
 
-
     @GET("api/geocode/json?sensor=true&key=AIzaSyAl_-UNqx3oY3vVPB21ieVHaGeenes2Hb8")
     Call<PlaceDetail> getPlaceID(@Query("latlng") String latlng);
 
-    @GET("api/BusStops")
-    Call<List<BusStopDB>> getAllBusStop();
-
-    @POST("api/Users")
-    Call<UserAccount> loginViaEmail(@Query("email") String email);
-
-    @POST("api/Users")
-    Call<UserAccount> loginViaEmail2(@Body JsonObject email);
+//    @GET("api/BusStops")
+//    Call<List<BusStopDB>> getAllBusStop();
+//
+//    @POST("api/Users")
+//    Call<UserAccount> loginViaEmail(@Query("email") String email);
+//
+//    @POST("api/Users")
+//    Call<UserAccount> loginViaEmail2(@Body JsonObject email);
 
 }
 

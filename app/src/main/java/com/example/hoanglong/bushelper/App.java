@@ -37,21 +37,18 @@ import static com.example.hoanglong.bushelper.api.Constant.MAP_URL;
  * Created by hoanglong on 26-Jun-17.
  */
 
-public class App extends Application implements BootstrapNotifier {
-    private RegionBootstrap regionBootstrap;
-    private BackgroundPowerSaver backgroundPowerSaver;
-    private BeaconManager mBeaconmanager;
-    final BootstrapNotifier notifier = this;
-    ArrayList<Region> regionList = new ArrayList();
-
-
+public class App extends Application {
+//        implements BootstrapNotifier {
+//    private RegionBootstrap regionBootstrap;
+//    private BackgroundPowerSaver backgroundPowerSaver;
+//    private BeaconManager mBeaconmanager;
+//    final BootstrapNotifier notifier = this;
+//    ArrayList<Region> regionList = new ArrayList();
 
     private NetComponent mNetComponent;
 
-    public List<BusStopDB> busStopListFromDB = new ArrayList<>();
-
-    private ServerAPI serverAPI;
-
+//    public List<BusStopDB> busStopListFromDB = new ArrayList<>();
+//    private ServerAPI serverAPI;
 
     @Override
     public void onCreate() {
@@ -62,29 +59,28 @@ public class App extends Application implements BootstrapNotifier {
                 .netModule(new NetModule(MAP_URL))
                 .build();
 
-        serverAPI = RetrofitUtils.get().create(ServerAPI.class);
+//        serverAPI = RetrofitUtils.get().create(ServerAPI.class);
 
-        serverAPI.getAllBusStop().enqueue(new Callback<List<BusStopDB>>() {
-            @Override
-            public void onResponse(Call<List<BusStopDB>> call, Response<List<BusStopDB>> response) {
-                busStopListFromDB = response.body();
-            }
+//        serverAPI.getAllBusStop().enqueue(new Callback<List<BusStopDB>>() {
+//            @Override
+//            public void onResponse(Call<List<BusStopDB>> call, Response<List<BusStopDB>> response) {
+//                busStopListFromDB = response.body();
+//            }
+//
+//            @Override
+//            public void onFailure(Call<List<BusStopDB>> call, Throwable t) {
+//                Log.d("test", t.getMessage());
+//            }
+//        });
 
-            @Override
-            public void onFailure(Call<List<BusStopDB>> call, Throwable t) {
-                Log.d("test", t.getMessage());
-
-            }
-        });
-
-        mBeaconmanager = org.altbeacon.beacon.BeaconManager.getInstanceForApplication(getBaseContext());
-        mBeaconmanager.getBeaconParsers().add(new BeaconParser().setBeaconLayout("m:2-3=0215,i:4-19,i:20-21,i:22-23,p:24-24"));
-
-        mBeaconmanager.setBackgroundMode(true);
-        backgroundPowerSaver = new BackgroundPowerSaver(getBaseContext());
-
-        mBeaconmanager.setBackgroundBetweenScanPeriod(25000l);
-        mBeaconmanager.setBackgroundScanPeriod(20000l);
+//        mBeaconmanager = org.altbeacon.beacon.BeaconManager.getInstanceForApplication(getBaseContext());
+//        mBeaconmanager.getBeaconParsers().add(new BeaconParser().setBeaconLayout("m:2-3=0215,i:4-19,i:20-21,i:22-23,p:24-24"));
+//
+//        mBeaconmanager.setBackgroundMode(true);
+//        backgroundPowerSaver = new BackgroundPowerSaver(getBaseContext());
+//
+//        mBeaconmanager.setBackgroundBetweenScanPeriod(25000l);
+//        mBeaconmanager.setBackgroundScanPeriod(20000l);
 
     }
 
@@ -92,65 +88,61 @@ public class App extends Application implements BootstrapNotifier {
         return mNetComponent;
     }
 
-    public List<BusStopDB> getBusStopListFromDB(){
-        serverAPI.getAllBusStop().enqueue(new Callback<List<BusStopDB>>() {
-            @Override
-            public void onResponse(Call<List<BusStopDB>> call, Response<List<BusStopDB>> response) {
-                busStopListFromDB = response.body();
-            }
+//    public List<BusStopDB> getBusStopListFromDB(){
+//        serverAPI.getAllBusStop().enqueue(new Callback<List<BusStopDB>>() {
+//            @Override
+//            public void onResponse(Call<List<BusStopDB>> call, Response<List<BusStopDB>> response) {
+//                busStopListFromDB = response.body();
+//            }
+//
+//            @Override
+//            public void onFailure(Call<List<BusStopDB>> call, Throwable t) {
+//                Log.d("test", t.getMessage());
+//
+//            }
+//        });
+//
+//        return busStopListFromDB;
+//    }
 
-            @Override
-            public void onFailure(Call<List<BusStopDB>> call, Throwable t) {
-                Log.d("test", t.getMessage());
+//    @Override
+//    public void didEnterRegion(Region region) {
+//        SendNotificationTask.sendNotification(getBaseContext(),"You are going to arrive "+ region.getUniqueId());
+//        for (Region tmp : mBeaconmanager.getMonitoredRegions()) {
+//            try {
+//                mBeaconmanager.stopMonitoringBeaconsInRegion(tmp);
+//            } catch (RemoteException e) {
+//                e.printStackTrace();
+//            }
+//        }
+//    }
 
-            }
-        });
+//    @Override
+//    public void didExitRegion(Region region) {
+//
+//    }
+//
+//    @Override
+//    public void didDetermineStateForRegion(int i, Region region) {
+//
+//    }
 
-        return busStopListFromDB;
-    }
-
-
-
-    @Override
-    public void didEnterRegion(Region region) {
-        SendNotificationTask.sendNotification(getBaseContext(),"You are going to arrive "+ region.getUniqueId());
-        for (Region tmp : mBeaconmanager.getMonitoredRegions()) {
-            try {
-                mBeaconmanager.stopMonitoringBeaconsInRegion(tmp);
-            } catch (RemoteException e) {
-                e.printStackTrace();
-            }
-        }
-
-    }
-
-    @Override
-    public void didExitRegion(Region region) {
-
-    }
-
-    @Override
-    public void didDetermineStateForRegion(int i, Region region) {
-
-    }
-
-    public void addBeaconToBeMonitered(Beacon aBeacon, BusStopDB busStop){
-        String uuid = aBeacon.getUuid();
-        Identifier identifier = Identifier.parse(uuid);
-        Identifier identifier2 = Identifier.parse(String.valueOf(aBeacon.getMajor()));
-        Identifier identifier3 = Identifier.parse(String.valueOf(aBeacon.getMinor()));
-
-        String uniqueName = busStop.getName()+" with bus number:";
-
-        for(BusInfoBusStop tmp : busStop.getBusInfoBusStops()){
-            uniqueName+=" "+tmp.getBusInfo().getNumber();
-        }
-
-        Region region = new Region(uniqueName, identifier, identifier2, identifier3);
-
-        regionList.add(region);
-
-        regionBootstrap = new RegionBootstrap(notifier, regionList);
-
-    }
+//    public void addBeaconToBeMonitered(Beacon aBeacon, BusStopDB busStop){
+//        String uuid = aBeacon.getUuid();
+//        Identifier identifier = Identifier.parse(uuid);
+//        Identifier identifier2 = Identifier.parse(String.valueOf(aBeacon.getMajor()));
+//        Identifier identifier3 = Identifier.parse(String.valueOf(aBeacon.getMinor()));
+//
+//        String uniqueName = busStop.getName()+" with bus number:";
+//
+//        for(BusInfoBusStop tmp : busStop.getBusInfoBusStops()){
+//            uniqueName+=" "+tmp.getBusInfo().getNumber();
+//        }
+//
+//        Region region = new Region(uniqueName, identifier, identifier2, identifier3);
+//
+//        regionList.add(region);
+//
+//        regionBootstrap = new RegionBootstrap(notifier, regionList);
+//    }
 }

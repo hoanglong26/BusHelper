@@ -249,9 +249,6 @@ public class MainActivity extends AppCompatActivity {
 //                if (ActivityCompat.checkSelfPermission(getBaseContext(), android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getBaseContext(), android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
 //                    return;
 //                }
-
-
-
             }
         });
 
@@ -281,7 +278,6 @@ public class MainActivity extends AppCompatActivity {
 
             }
         });
-
 
         adapterViewPager = new FragmentAdapter(getSupportFragmentManager(), "0");
         viewPager.setAdapter(adapterViewPager);
@@ -319,15 +315,10 @@ public class MainActivity extends AppCompatActivity {
         if(!Utils.isLocationEnabled(MainActivity.this)){
             Utils.createLocationErrorDialog(MainActivity.this);
         }
-
-
-
     }
 
 
     private void populateAdapter(final String query) {
-
-
         final List<Location> locations = new ArrayList<>();
 
         //Southwest corner to Northeast corner.
@@ -363,9 +354,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-
         Observer<PlacePrediction> observer = new Observer<PlacePrediction>() {
-
             @Override
             public void onNext(PlacePrediction value) {
                 Log.e(TAG, "onNext: " + value);
@@ -387,7 +376,6 @@ public class MainActivity extends AppCompatActivity {
                                     }
 
                                     mAdapter.changeCursor(c);
-                                } else {
                                 }
                                 places.release();
                             }
@@ -408,15 +396,12 @@ public class MainActivity extends AppCompatActivity {
         };
 
         observable.subscribeOn(Schedulers.io()).subscribe(observer);
-
-
     }
 
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.origin, menu);
-
 
         Gson gson = new Gson();
         SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
@@ -436,7 +421,6 @@ public class MainActivity extends AppCompatActivity {
             Glide.with(this).load(account.getAvatarUrl()).into(cvImg);
         }
 
-
         MenuItem item = menu.findItem(R.id.action_logout);
         SpannableStringBuilder builder = new SpannableStringBuilder("*  Logout");
         // replace "*" with icon
@@ -449,9 +433,7 @@ public class MainActivity extends AppCompatActivity {
                         new ResultCallback<Status>() {
                             @Override
                             public void onResult(Status status) {
-
                                 SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
-
 
                                 //Remove all info of current account
                                 SharedPreferences.Editor editor = sharedPref.edit();
@@ -459,7 +441,6 @@ public class MainActivity extends AppCompatActivity {
                                 editor.putString("userID", "");
 
                                 editor.commit();
-
 
                                 Intent intent = new Intent(getBaseContext(), LoginActivity.class);
                                 startActivity(intent);
@@ -486,15 +467,12 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onPause() {
         EventBus.getDefault().unregister(this);
-
         super.onPause();
     }
 
     //Subscribe action for Event Bus
     @Subscribe
     public void onEvent(FragmentAdapter.OpenEvent event) {
-
-
         Toast.makeText(getBaseContext(), "Starting Map", Toast.LENGTH_SHORT).show();
 
         Intent intent = new Intent(getBaseContext(), MapsActivity.class);
@@ -502,8 +480,6 @@ public class MainActivity extends AppCompatActivity {
         intent.putExtra("busStop", aLocation);
         startActivity(intent);
         finish();
-
-
     }
 
 

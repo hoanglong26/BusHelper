@@ -21,8 +21,6 @@ import com.example.hoanglong.bushelper.R;
 
 public class SendNotificationTask {
     public static void sendNotification(Context context, String content) {
-
-
             NotificationCompat.Builder builder =
                     new NotificationCompat.Builder(context)
                             .setContentTitle("Bus Helper")
@@ -48,7 +46,6 @@ public class SendNotificationTask {
             NotificationManager notificationManager =
                     (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
             notificationManager.notify(1, builder.build());
-
     }
 
 

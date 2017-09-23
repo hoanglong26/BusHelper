@@ -45,7 +45,6 @@ public class FavoriteFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
     }
 
     @Override
@@ -54,7 +53,6 @@ public class FavoriteFragment extends Fragment {
         View rootView = inflater.inflate(R.layout.fragment_favorite, container, false);
 
         ButterKnife.bind(this,rootView);
-
 
         FastItemAdapter<Favorite> fastAdapter = new FastItemAdapter<>();
         rvFavorite.setLayoutManager(new GridLayoutManager(getActivity(), 2));
@@ -84,7 +82,6 @@ public class FavoriteFragment extends Fragment {
                 return true;
             }
         });
-
 
         return rootView;
     }

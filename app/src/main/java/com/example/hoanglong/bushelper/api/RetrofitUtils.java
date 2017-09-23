@@ -15,7 +15,7 @@ public class RetrofitUtils {
             .connectTimeout(20, TimeUnit.SECONDS)
             .readTimeout(20,TimeUnit.SECONDS).build();
     private static Retrofit.Builder builder = new Retrofit.Builder()
-            .baseUrl(Constant.WEB_URL).client(client).addConverterFactory(GsonConverterFactory.create());
+            .baseUrl(Constant.MAP_URL).client(client).addConverterFactory(GsonConverterFactory.create());
 
     public static Retrofit get() {
         return builder.build();

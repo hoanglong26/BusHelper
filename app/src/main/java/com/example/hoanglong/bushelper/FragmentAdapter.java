@@ -27,11 +27,8 @@ public class FragmentAdapter extends FragmentPagerAdapter {
 
             default:
                 return HistoryFragment.newInstance("");
-
         }
-
     }
-
 
     @Override
     public int getCount() {

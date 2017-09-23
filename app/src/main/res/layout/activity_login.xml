@@ -64,7 +64,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="5dp"
                 android:paddingStart="25dp"
-                android:text="For Registered Members"
+                android:text="For Google User"
                 android:textColor="@color/md_white_1000"
                 android:textSize="20sp" />
 

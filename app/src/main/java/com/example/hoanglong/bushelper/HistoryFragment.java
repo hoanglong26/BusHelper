@@ -44,8 +44,6 @@ public class HistoryFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-
     }
 
     @Override
@@ -53,7 +51,6 @@ public class HistoryFragment extends Fragment {
                              Bundle savedInstanceState) {
         View rootView =  inflater.inflate(R.layout.fragment_history, container, false);
         ButterKnife.bind(this,rootView);
-
 
         FastItemAdapter<Location> fastAdapter = new FastItemAdapter<>();
         rvHistory.setLayoutManager(new GridLayoutManager(getActivity(), 2));

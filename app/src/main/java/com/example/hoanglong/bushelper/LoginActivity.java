@@ -1,8 +1,6 @@
 package com.example.hoanglong.bushelper;
 
-import android.app.AlertDialog;
 import android.app.ProgressDialog;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Typeface;
@@ -14,10 +12,6 @@ import android.view.View;
 import android.widget.TextView;
 
 import com.example.hoanglong.bushelper.POJO.EmailInfo;
-import com.example.hoanglong.bushelper.POJO.UserAccount;
-import com.example.hoanglong.bushelper.api.RetrofitUtils;
-import com.example.hoanglong.bushelper.api.ServerAPI;
-import com.example.hoanglong.bushelper.utils.SendNotificationTask;
 import com.google.android.gms.auth.api.Auth;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
@@ -32,10 +26,6 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
-
 
 public class LoginActivity extends FragmentActivity implements GoogleApiClient.OnConnectionFailedListener, View.OnClickListener {
 
@@ -45,9 +35,8 @@ public class LoginActivity extends FragmentActivity implements GoogleApiClient.O
     private GoogleApiClient mGoogleApiClient;
     private ProgressDialog mProgressDialog;
 
-    private ServerAPI serverAPI;
-
-    private UserAccount userAccount;
+//    private ServerAPI serverAPI;
+//    private UserAccount userAccount;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -67,7 +56,6 @@ public class LoginActivity extends FragmentActivity implements GoogleApiClient.O
             tvTitle.setTypeface(custom_font2);
         }
 
-
         // Button listeners
         findViewById(R.id.sign_in_button).setOnClickListener(this);
         findViewById(R.id.btnGuest).setOnClickListener(this);
@@ -83,7 +71,6 @@ public class LoginActivity extends FragmentActivity implements GoogleApiClient.O
         // [START build_client]
         // Build a GoogleApiClient with access to the Google Sign-In API and the
         // options specified by gso.
-
         mGoogleApiClient = new GoogleApiClient.Builder(this)
                 .enableAutoManage(this /* FragmentActivity */, this /* OnConnectionFailedListener */)
                 .addApi(Auth.GOOGLE_SIGN_IN_API, gso)
@@ -95,8 +82,7 @@ public class LoginActivity extends FragmentActivity implements GoogleApiClient.O
         signInButton.setSize(SignInButton.SIZE_WIDE);
         signInButton.setScopes(gso.getScopeArray());
 
-        serverAPI = RetrofitUtils.get().create(ServerAPI.class);
-
+//        serverAPI = RetrofitUtils.get().create(ServerAPI.class);
     }
 
 
@@ -109,15 +95,13 @@ public class LoginActivity extends FragmentActivity implements GoogleApiClient.O
 
         String userID = sharedPref.getString("userID", "");
 
-        userID = "";
+//        userID = "";
         if (!userID.equals("")) {
             // If the user's cached credentials are valid, the OptionalPendingResult will be "done"
             // and the GoogleSignInResult will be available instantly.
-
             Intent intent = new Intent(getBaseContext(), MainActivity.class);
             startActivity(intent);
             finish();
-
         } else {
 
             // If the user has not previously signed in on this device or the sign-in has expired,
@@ -132,9 +116,7 @@ public class LoginActivity extends FragmentActivity implements GoogleApiClient.O
                 }
             });
         }
-
 //        mAuth.addAuthStateListener(mAuthListener);
-
     }
 
     @Override
@@ -157,10 +139,8 @@ public class LoginActivity extends FragmentActivity implements GoogleApiClient.O
 
     // [START handleSignInResult]
     private void handleSignInResult(GoogleSignInResult result) {
-        //TODO
         if (result.isSuccess()) {
             final GoogleSignInAccount acct = result.getSignInAccount();
-
 
             EmailInfo email = new EmailInfo(acct.getEmail());
             Gson gson = new GsonBuilder()
@@ -168,87 +148,106 @@ public class LoginActivity extends FragmentActivity implements GoogleApiClient.O
                     .create();
             JsonObject obj = gson.toJsonTree(email).getAsJsonObject();
 
-            showProgressDialog();
+            SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
+            SharedPreferences.Editor editor = sharedPref.edit();
+            editor.putString("userToken", acct.getIdToken());
+            editor.putString("userID", acct.getId() + "");
+            editor.commit();
 
-            serverAPI.loginViaEmail(acct.getEmail()).enqueue(new Callback<UserAccount>() {
-                //                                    serverAPI.loginViaEmail2(obj).enqueue(new Callback<UserAccount>() {
-                @Override
-                public void onResponse(Call<UserAccount> call, Response<UserAccount> response) {
-                    userAccount = response.body();
-                    hideProgressDialog();
-                    if (userAccount != null && userAccount.getToken() != null) {
-                        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
-                        SharedPreferences.Editor editor = sharedPref.edit();
-                        editor.putString("userToken", userAccount.getToken());
-                        editor.putString("userID", userAccount.getId() + "");
-                        editor.commit();
+            EmailInfo account;
+            if (acct.getPhotoUrl() == null) {
+                account = new EmailInfo(acct.getEmail(), acct.getDisplayName(), "");
+            } else {
+                account = new EmailInfo(acct.getEmail(), acct.getDisplayName(), acct.getPhotoUrl().toString());
+            }
 
-                        EmailInfo account;
-                        if (acct.getPhotoUrl() == null) {
-                            account = new EmailInfo(acct.getEmail(), acct.getDisplayName(), "");
-                        } else {
-                            account = new EmailInfo(acct.getEmail(), acct.getDisplayName(), acct.getPhotoUrl().toString());
-                        }
+            Gson gson2 = new Gson();
+            String jsonAccount = gson2.toJson(account);
+            editor.putString("userAccount", jsonAccount);
+            editor.commit();
+            Intent intent = new Intent(getBaseContext(), MainActivity.class);
+            startActivity(intent);
+            finish();
 
-                        Gson gson2 = new Gson();
-                        String jsonAccount = gson2.toJson(account);
-                        editor.putString("userAccount", jsonAccount);
-                        editor.commit();
+//            showProgressDialog();
 
-                        Intent intent = new Intent(getBaseContext(), MainActivity.class);
-                        startActivity(intent);
-                        finish();
-
-                    } else {
-                        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
-                        SharedPreferences.Editor editor = sharedPref.edit();
-                        editor.putString("userToken", "");
-                        editor.putString("userID", "");
-                        editor.commit();
-                        signOut();
-
-                        AlertDialog alertDialog = new AlertDialog.Builder(LoginActivity.this).create();
-                        alertDialog.setTitle("Login Failed");
-                        alertDialog.setMessage("This function can only be used by registered user.");
-                        alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "OK",
-                                new DialogInterface.OnClickListener() {
-                                    public void onClick(DialogInterface dialog, int which) {
-                                        dialog.dismiss();
-                                    }
-                                });
-                        hideProgressDialog();
-                        alertDialog.show();
-
-
-                    }
-                }
-
-                @Override
-                public void onFailure(Call<UserAccount> call, Throwable t) {
-                    SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
-                    SharedPreferences.Editor editor = sharedPref.edit();
-                    editor.putString("userToken", "");
-                    editor.putString("userID", "");
-                    editor.commit();
-                    signOut();
-
-
-                    AlertDialog alertDialog = new AlertDialog.Builder(LoginActivity.this).create();
-                    alertDialog.setTitle("Login Failed");
-                    alertDialog.setMessage("Please turn on internet connection");
-                    alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "OK",
-                            new DialogInterface.OnClickListener() {
-                                public void onClick(DialogInterface dialog, int which) {
-                                    dialog.dismiss();
-                                }
-                            });
-                    hideProgressDialog();
-                    alertDialog.show();
-
-                }
-            });
-
-
+//            serverAPI.loginViaEmail(acct.getEmail()).enqueue(new Callback<UserAccount>() {
+//                //                                    serverAPI.loginViaEmail2(obj).enqueue(new Callback<UserAccount>() {
+//                @Override
+//                public void onResponse(Call<UserAccount> call, Response<UserAccount> response) {
+//                    userAccount = response.body();
+//                    hideProgressDialog();
+//                    if (userAccount != null && userAccount.getToken() != null) {
+//                        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
+//                        SharedPreferences.Editor editor = sharedPref.edit();
+//                        editor.putString("userToken", userAccount.getToken());
+//                        editor.putString("userID", userAccount.getId() + "");
+//                        editor.commit();
+//
+//                        EmailInfo account;
+//                        if (acct.getPhotoUrl() == null) {
+//                            account = new EmailInfo(acct.getEmail(), acct.getDisplayName(), "");
+//                        } else {
+//                            account = new EmailInfo(acct.getEmail(), acct.getDisplayName(), acct.getPhotoUrl().toString());
+//                        }
+//
+//                        Gson gson2 = new Gson();
+//                        String jsonAccount = gson2.toJson(account);
+//                        editor.putString("userAccount", jsonAccount);
+//                        editor.commit();
+//
+//                        Intent intent = new Intent(getBaseContext(), MainActivity.class);
+//                        startActivity(intent);
+//                        finish();
+//
+//                    } else {
+//                        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
+//                        SharedPreferences.Editor editor = sharedPref.edit();
+//                        editor.putString("userToken", "");
+//                        editor.putString("userID", "");
+//                        editor.commit();
+//                        signOut();
+//
+//                        AlertDialog alertDialog = new AlertDialog.Builder(LoginActivity.this).create();
+//                        alertDialog.setTitle("Login Failed");
+//                        alertDialog.setMessage("This function can only be used by registered user.");
+//                        alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "OK",
+//                                new DialogInterface.OnClickListener() {
+//                                    public void onClick(DialogInterface dialog, int which) {
+//                                        dialog.dismiss();
+//                                    }
+//                                });
+//                        hideProgressDialog();
+//                        alertDialog.show();
+//
+//
+//                    }
+//                }
+//
+//                @Override
+//                public void onFailure(Call<UserAccount> call, Throwable t) {
+//                    SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
+//                    SharedPreferences.Editor editor = sharedPref.edit();
+//                    editor.putString("userToken", "");
+//                    editor.putString("userID", "");
+//                    editor.commit();
+//                    signOut();
+//
+//
+//                    AlertDialog alertDialog = new AlertDialog.Builder(LoginActivity.this).create();
+//                    alertDialog.setTitle("Login Failed");
+//                    alertDialog.setMessage("Please turn on internet connection");
+//                    alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "OK",
+//                            new DialogInterface.OnClickListener() {
+//                                public void onClick(DialogInterface dialog, int which) {
+//                                    dialog.dismiss();
+//                                }
+//                            });
+//                    hideProgressDialog();
+//                    alertDialog.show();
+//
+//                }
+//            });
         }
     }
     // [END handleSignInResult]
@@ -279,7 +278,6 @@ public class LoginActivity extends FragmentActivity implements GoogleApiClient.O
     public void onConnectionFailed(ConnectionResult connectionResult) {
         // An unresolvable error has occurred and Google APIs (including Sign-In) will not
         // be available.
-
         Log.d(TAG, "onConnectionFailed:" + connectionResult);
     }
 
@@ -289,7 +287,6 @@ public class LoginActivity extends FragmentActivity implements GoogleApiClient.O
             mProgressDialog.setMessage("Loading");
             mProgressDialog.setIndeterminate(true);
         }
-
         mProgressDialog.show();
     }
 
@@ -304,7 +301,6 @@ public class LoginActivity extends FragmentActivity implements GoogleApiClient.O
         if (signedIn) {
             findViewById(R.id.sign_in_button).setVisibility(View.GONE);
         } else {
-
             findViewById(R.id.sign_in_button).setVisibility(View.VISIBLE);
         }
     }
@@ -326,9 +322,7 @@ public class LoginActivity extends FragmentActivity implements GoogleApiClient.O
                 Intent intent = new Intent(getBaseContext(), MainActivity.class);
                 startActivity(intent);
                 finish();
-
                 break;
-
         }
     }
 

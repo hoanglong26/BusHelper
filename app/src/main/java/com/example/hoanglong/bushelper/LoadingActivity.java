@@ -33,7 +33,6 @@ public class LoadingActivity extends AppCompatActivity {
 
     Animation animation;
 
-
     Handler mHandler = new Handler() {
         public void handleMessage(android.os.Message msg) {
             Intent intent = new Intent();
