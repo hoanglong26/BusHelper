@@ -21,7 +21,7 @@ import java.util.List;
  * Created by hoanglong on 21-Jun-17.
  */
 @DatabaseTable
-public class Location extends AbstractItem<Location,Location.ViewHolder> implements Parcelable {
+public class TheLocation extends AbstractItem<TheLocation,TheLocation.ViewHolder> implements Parcelable {
 
     @DatabaseField(generatedId = true)
     private int id;
@@ -38,14 +38,14 @@ public class Location extends AbstractItem<Location,Location.ViewHolder> impleme
     @DatabaseField
     private String place_image;
 
-    public Location(int id, String name, double latitude,double longitude) {
+    public TheLocation(int id, String name, double latitude, double longitude) {
         this.id = id;
         this.name = name;
         this.longitude = longitude;
         this.latitude = latitude;
     }
 
-    public Location(int id, String name, double latitude, double longitude, String place_image) {
+    public TheLocation(int id, String name, double latitude, double longitude, String place_image) {
         this.id = id;
         this.name = name;
         this.longitude = longitude;
@@ -53,20 +53,20 @@ public class Location extends AbstractItem<Location,Location.ViewHolder> impleme
         this.place_image = place_image;
     }
 
-    public Location() {
+    public TheLocation() {
     }
 
-    protected Location(Parcel in) {
+    protected TheLocation(Parcel in) {
         id = in.readInt();
         name = in.readString();
         longitude = in.readDouble();
         latitude = in.readDouble();
     }
 
-    public static final Creator<Location> CREATOR = new Creator<Location>() {
+    public static final Creator<TheLocation> CREATOR = new Creator<TheLocation>() {
         @Override
-        public Location createFromParcel(Parcel in) {
-            Location instance = new Location();
+        public TheLocation createFromParcel(Parcel in) {
+            TheLocation instance = new TheLocation();
             instance.id = ((int) in.readValue((Integer.class.getClassLoader())));
             instance.name = ((String) in.readValue((String.class.getClassLoader())));
             instance.latitude = ((Double) in.readValue((Double.class.getClassLoader())));
@@ -76,8 +76,8 @@ public class Location extends AbstractItem<Location,Location.ViewHolder> impleme
         }
 
         @Override
-        public Location[] newArray(int size) {
-            return new Location[size];
+        public TheLocation[] newArray(int size) {
+            return new TheLocation[size];
         }
     };
 
@@ -213,8 +213,8 @@ public class Location extends AbstractItem<Location,Location.ViewHolder> impleme
     public boolean equals(Object v) {
         boolean flag = false;
 
-        if (v instanceof Location){
-            Location ptr = (Location) v;
+        if (v instanceof TheLocation){
+            TheLocation ptr = (TheLocation) v;
             flag = ptr.getName().equals(this.name);
         }
 

@@ -1,9 +1,9 @@
 package com.example.hoanglong.bushelper;
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.database.MatrixCursor;
 import android.graphics.Typeface;
@@ -15,11 +15,11 @@ import android.provider.BaseColumns;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
 import android.support.design.widget.FloatingActionButton;
-import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.CursorAdapter;
 import android.support.v4.widget.SimpleCursorAdapter;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.SearchView;
 import android.text.SpannableStringBuilder;
@@ -38,8 +38,8 @@ import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.example.hoanglong.bushelper.POJO.EmailInfo;
-import com.example.hoanglong.bushelper.entities.Location;
 import com.example.hoanglong.bushelper.POJO.PlacePrediction;
+import com.example.hoanglong.bushelper.entities.TheLocation;
 import com.example.hoanglong.bushelper.ormlite.DatabaseManager;
 import com.example.hoanglong.bushelper.utils.Utils;
 import com.google.android.gms.auth.api.Auth;
@@ -92,10 +92,9 @@ public class MainActivity extends AppCompatActivity {
     Button searchBtn;
 
 
-
     FragmentPagerAdapter adapterViewPager;
 
-    Location result = null;
+    TheLocation result = null;
 
     android.location.Location mLocation;
     LocationManager locationManager;
@@ -156,16 +155,16 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public boolean onQueryTextSubmit(String query) {
                 searchView.onActionViewCollapsed();
-                if(!Utils.checkInternetOn(getBaseContext())){
+                if (!Utils.checkInternetOn(getBaseContext())) {
                     Utils.createNetErrorDialog(MainActivity.this);
                 }
 
-                if(!Utils.isLocationEnabled(MainActivity.this)){
+                if (!Utils.isLocationEnabled(MainActivity.this)) {
                     Utils.createLocationErrorDialog(MainActivity.this);
                 }
 
                 if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                    if(Utils.checkLocationPermission(MainActivity.this)){
+                    if (Utils.checkLocationPermission(MainActivity.this)) {
                         Intent intent = new Intent(getBaseContext(), MapsActivity.class);
                         if (result != null) {
                             Toast.makeText(getBaseContext(), "Starting Map", Toast.LENGTH_SHORT).show();
@@ -197,12 +196,12 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 searchView.onActionViewCollapsed();
-                if(!Utils.checkInternetOn(getBaseContext())){
+                if (!Utils.checkInternetOn(getBaseContext())) {
                     Utils.createNetErrorDialog(MainActivity.this);
                 }
 
 
-                if(!Utils.isLocationEnabled(MainActivity.this)){
+                if (!Utils.isLocationEnabled(MainActivity.this)) {
                     Utils.createLocationErrorDialog(MainActivity.this);
                 }
                 Intent intent = new Intent(getBaseContext(), MapsActivity.class);
@@ -224,21 +223,20 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 //Setup to get location
-                if(!Utils.checkInternetOn(getBaseContext())){
+                if (!Utils.checkInternetOn(getBaseContext())) {
                     Utils.createNetErrorDialog(MainActivity.this);
                 }
 
-                if(!Utils.isLocationEnabled(MainActivity.this)){
+                if (!Utils.isLocationEnabled(MainActivity.this)) {
                     Utils.createLocationErrorDialog(MainActivity.this);
                 }
 
 
-
                 if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                    if(Utils.checkLocationPermission(MainActivity.this)){
+                    if (Utils.checkLocationPermission(MainActivity.this)) {
 
                         mLocation = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
-                        result = new Location(0, "My location", mLocation.getLatitude(), mLocation.getLongitude());
+                        result = new TheLocation(0, "My location", mLocation.getLatitude(), mLocation.getLongitude());
                         Intent intent = new Intent(getBaseContext(), MapsActivity.class);
                         intent.putExtra("busStop", result);
                         startActivity(intent);
@@ -264,7 +262,7 @@ public class MainActivity extends AppCompatActivity {
                 Cursor cursor = searchView.getSuggestionsAdapter().getCursor();
                 cursor.moveToPosition(position);
                 String suggestion = cursor.getString(1);//0 is the index of col containing suggestion name.
-                result = new Location(Integer.parseInt(cursor.getString(0)),
+                result = new TheLocation(Integer.parseInt(cursor.getString(0)),
                         cursor.getString(1),
                         Double.parseDouble(cursor.getString(2)),
                         Double.parseDouble(cursor.getString(3)));
@@ -308,18 +306,18 @@ public class MainActivity extends AppCompatActivity {
             Utils.checkLocationPermission(this);
         }
 
-        if(!Utils.checkInternetOn(this)){
+        if (!Utils.checkInternetOn(this)) {
             Utils.createNetErrorDialog(this);
         }
 
-        if(!Utils.isLocationEnabled(MainActivity.this)){
+        if (!Utils.isLocationEnabled(MainActivity.this)) {
             Utils.createLocationErrorDialog(MainActivity.this);
         }
     }
 
 
     private void populateAdapter(final String query) {
-        final List<Location> locations = new ArrayList<>();
+        final List<TheLocation> locations = new ArrayList<>();
 
         //Southwest corner to Northeast corner.
 //        final LatLngBounds bounds = new LatLngBounds(new LatLng(10.719123, 106.602913), new LatLng(10.885713, 106.646757));
@@ -366,7 +364,7 @@ public class MainActivity extends AppCompatActivity {
                                 if (places.getStatus().isSuccess() && places.getCount() > 0) {
                                     final Place myPlace = places.get(0);
 
-                                    Location aLocation = new Location(0, myPlace.getName() + ", " + myPlace.getAddress(), myPlace.getLatLng().latitude, myPlace.getLatLng().longitude);
+                                    TheLocation aLocation = new TheLocation(0, myPlace.getName() + ", " + myPlace.getAddress(), myPlace.getLatLng().latitude, myPlace.getLatLng().longitude);
                                     locations.add(aLocation);
                                     final MatrixCursor c = new MatrixCursor(new String[]{BaseColumns._ID, "busStopName", "lat", "long"});
                                     for (int i = 0; i < locations.size(); i++) {
@@ -407,7 +405,7 @@ public class MainActivity extends AppCompatActivity {
         SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
         String jsonPatients = sharedPref.getString("userAccount", "");
 
-        if(!jsonPatients.equals("")){
+        if (!jsonPatients.equals("")) {
             Type type = new TypeToken<EmailInfo>() {
             }.getType();
             EmailInfo account = gson.fromJson(jsonPatients, type);
@@ -470,13 +468,33 @@ public class MainActivity extends AppCompatActivity {
         super.onPause();
     }
 
+    @Override
+    public void onBackPressed() {
+
+
+        new AlertDialog.Builder(this)
+                .setTitle("Really Exit?")
+                .setMessage("Are you sure you want to exit?")
+                .setNegativeButton(android.R.string.no, null)
+                .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        Intent a = new Intent(Intent.ACTION_MAIN);
+                        a.addCategory(Intent.CATEGORY_HOME);
+                        a.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                        startActivity(a);
+                    }
+                }).create().show();
+    }
+
     //Subscribe action for Event Bus
     @Subscribe
     public void onEvent(FragmentAdapter.OpenEvent event) {
         Toast.makeText(getBaseContext(), "Starting Map", Toast.LENGTH_SHORT).show();
 
         Intent intent = new Intent(getBaseContext(), MapsActivity.class);
-        Location aLocation = new Location(event.position, "aLocation", event.lat, event.lng);
+        TheLocation aLocation = new TheLocation(event.position, "aLocation", event.lat, event.lng);
         intent.putExtra("busStop", aLocation);
         startActivity(intent);
         finish();

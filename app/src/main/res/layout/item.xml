@@ -33,26 +33,27 @@
                 android:id="@+id/tvName"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="5dp"
                 android:textSize="14sp"
                 android:textStyle="bold"
                 tools:text="tp hcm, hahaha"
                 />
-
-
 
                 <TextView
                     android:id="@+id/tvLat"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:textSize="14sp"
-                    tools:text="10,1111" />
+                    tools:text="10,1111"
+                    android:visibility="gone"/>
 
                 <TextView
                     android:id="@+id/tvLong"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:textSize="14sp"
-                    tools:text="106,55345" />
+                    tools:text="106,55345"
+                    android:visibility="gone"/>
 
 
 

@@ -36,9 +36,9 @@
                     android:background="#009688"
                     android:drawableRight="@android:drawable/arrow_down_float"
                     android:paddingRight="10dp"
+                    android:text="@string/please_choose_location"
                     android:textColor="#fff"
-                    android:textSize="12sp"
-                    android:text="@string/please_choose_location"/>
+                    android:textSize="12sp" />
 
                 <com.github.aakira.expandablelayout.ExpandableRelativeLayout
                     android:id="@+id/expandableLayout1"
@@ -46,43 +46,42 @@
                     android:layout_height="wrap_content"
                     android:layout_below="@+id/expandableButton1"
                     android:background="#80CBC4"
+                    android:paddingBottom="0dp"
                     android:paddingLeft="10dp"
                     android:paddingRight="10dp"
-                    android:paddingBottom="0dp"
                     app:ael_duration="300"
                     app:ael_expanded="false"
                     app:ael_interpolator="bounce"
-                    app:ael_orientation="vertical"
-                    >
+                    app:ael_orientation="vertical">
 
                     <TextView
-                        android:layout_marginTop="10dp"
-                        android:layout_centerHorizontal="true"
                         android:id="@+id/tutorial"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:layout_centerHorizontal="true"
+                        android:layout_marginTop="10dp"
                         android:text="@string/click_on_map_to_add_your_destinations"
-                        android:textStyle="bold"
-                        android:textSize="16sp"/>
+                        android:textSize="16sp"
+                        android:textStyle="bold" />
 
 
                     <TextView
-                        android:layout_centerHorizontal="true"
-                        android:layout_below="@id/tutorial"
                         android:id="@+id/tutorial2"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:layout_below="@id/tutorial"
+                        android:layout_centerHorizontal="true"
                         android:layout_marginTop="5dp"
                         android:text="@string/click_on_marker_to_show_options"
-                        android:textSize="16sp"/>
+                        android:textSize="16sp" />
 
 
                     <ImageView
-                        android:layout_below="@id/tutorial2"
-                        android:layout_centerHorizontal="true"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:src="@drawable/marks"/>
+                        android:layout_below="@id/tutorial2"
+                        android:layout_centerHorizontal="true"
+                        android:src="@drawable/marks" />
 
                 </com.github.aakira.expandablelayout.ExpandableRelativeLayout>
 
@@ -105,9 +104,9 @@
 
                 <com.andremion.counterfab.CounterFab
                     android:id="@+id/btnAdd"
-                    android:layout_above="@id/btnGo"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_above="@id/btnGo"
                     android:layout_alignParentEnd="true"
                     android:layout_marginEnd="10dp"
                     android:elevation="6dp"
@@ -115,25 +114,22 @@
                     android:theme="@style/FloatingActionButton2"
                     app:elevation="6dp"
                     app:fabSize="normal"
-                    app:rippleColor="#50ffffff"
-                    />
+                    app:rippleColor="#50ffffff" />
 
                 <!--<android.support.design.widget.FloatingActionButton-->
-                    <!--android:layout_above="@id/btnGo"-->
-                    <!--android:layout_width="wrap_content"-->
-                    <!--android:layout_height="wrap_content"-->
-                    <!--android:layout_alignParentEnd="true"-->
-                    <!--android:layout_marginBottom="10dp"-->
-                    <!--android:layout_marginEnd="20dp"-->
-                    <!--android:clickable="true"-->
-                    <!--android:elevation="6dp"-->
-                    <!--android:src="@drawable/icon_bus"-->
-                    <!--android:theme="@style/FloatingActionButton2"-->
-                    <!--app:elevation="6dp"-->
-                    <!--app:fabSize="normal"-->
-                    <!--app:rippleColor="#50ffffff" />-->
-
-
+                <!--android:layout_above="@id/btnGo"-->
+                <!--android:layout_width="wrap_content"-->
+                <!--android:layout_height="wrap_content"-->
+                <!--android:layout_alignParentEnd="true"-->
+                <!--android:layout_marginBottom="10dp"-->
+                <!--android:layout_marginEnd="20dp"-->
+                <!--android:clickable="true"-->
+                <!--android:elevation="6dp"-->
+                <!--android:src="@drawable/icon_bus"-->
+                <!--android:theme="@style/FloatingActionButton2"-->
+                <!--app:elevation="6dp"-->
+                <!--app:fabSize="normal"-->
+                <!--app:rippleColor="#50ffffff" />-->
 
 
             </RelativeLayout>
@@ -149,22 +145,27 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_margin="6dp"
+                android:drawableLeft="@drawable/ic_directions_black_24dp"
+                android:drawablePadding="5dp"
                 android:text="Instruction"
                 android:textColor="@android:color/black"
                 android:textSize="16sp"
-                android:textStyle="bold"
-                android:drawableLeft="@drawable/ic_directions_black_24dp"
-                android:drawablePadding="5dp"/>
+                android:textStyle="bold" />
 
-            <TextView
-                android:id="@+id/tvInstruction"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_margin="6dp"
-                android:text="Please search route"
-                android:textColor="@android:color/black"
-                android:textSize="16sp" />
+            <ScrollView
+                android:id="@+id/ScrollView01"
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent">
 
+                <TextView
+                    android:id="@+id/tvInstruction"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="6dp"
+                    android:text="Please search route"
+                    android:textColor="@android:color/black"
+                    android:textSize="16sp" />
+            </ScrollView>
         </LinearLayout>
 
     </com.sothree.slidinguppanel.SlidingUpPanelLayout>

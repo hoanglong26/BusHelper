@@ -4,7 +4,7 @@ import android.content.Context;
 import android.database.SQLException;
 
 import com.example.hoanglong.bushelper.entities.Favorite;
-import com.example.hoanglong.bushelper.entities.Location;
+import com.example.hoanglong.bushelper.entities.TheLocation;
 
 import java.util.List;
 
@@ -35,8 +35,8 @@ public class DatabaseManager {
         return helper;
     }
 
-    public List<Location> getAllLocations() {
-        List<Location> locations = null;
+    public List<TheLocation> getAllLocations() {
+        List<TheLocation> locations = null;
         try {
             locations = getHelper().getLocationDao().queryForAll();
         }
@@ -47,7 +47,7 @@ public class DatabaseManager {
     }
 
 
-    public void addLocation(Location l) {
+    public void addLocation(TheLocation l) {
         try {
             getHelper().getLocationDao().create(l);
         } catch (SQLException e) {
@@ -57,7 +57,7 @@ public class DatabaseManager {
         }
     }
 
-    public void deleteLocation(Location subject) {
+    public void deleteLocation(TheLocation subject) {
         try {
             getHelper().getLocationDao().delete(subject);
         } catch (java.sql.SQLException e) {

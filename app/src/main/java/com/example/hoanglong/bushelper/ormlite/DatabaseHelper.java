@@ -6,7 +6,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 
 import com.example.hoanglong.bushelper.entities.Favorite;
-import com.example.hoanglong.bushelper.entities.Location;
+import com.example.hoanglong.bushelper.entities.TheLocation;
 import com.j256.ormlite.android.apptools.OrmLiteSqliteOpenHelper;
 import com.j256.ormlite.dao.Dao;
 import com.j256.ormlite.support.ConnectionSource;
@@ -28,7 +28,7 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
     private static final int DATABASE_VERSION = 1;
 
     // the DAO object we use to access the SimpleData table
-    private Dao<Location, Integer> locationDao = null;
+    private Dao<TheLocation, Integer> locationDao = null;
 
     private Dao<Favorite, Integer> favoriteDao = null;
 
@@ -39,7 +39,7 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
     @Override
     public void onCreate(SQLiteDatabase database, ConnectionSource connectionSource) {
         try {
-            TableUtils.createTable(connectionSource, Location.class);
+            TableUtils.createTable(connectionSource, TheLocation.class);
             TableUtils.createTable(connectionSource, Favorite.class);
 
         } catch (SQLException e) {
@@ -69,10 +69,10 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
         }
     }
 
-    public Dao<Location, Integer> getLocationDao() {
+    public Dao<TheLocation, Integer> getLocationDao() {
         if (null == locationDao) {
             try {
-                locationDao = getDao(Location.class);
+                locationDao = getDao(TheLocation.class);
             }catch (java.sql.SQLException e) {
                 e.printStackTrace();
             }
