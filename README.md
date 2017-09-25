@@ -36,7 +36,7 @@ Open app and try it.
 
 ## Version
 
-1.0
+2.0
 
 ## Authors
 
