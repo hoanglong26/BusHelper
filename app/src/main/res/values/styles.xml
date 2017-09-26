@@ -42,8 +42,18 @@
     </style>
 
     <style name="FloatingActionButton2">
+        <item name="colorAccent">@color/md_teal_200</item>
+    </style>
+
+    <style name="FloatingActionButton3">
+        <item name="colorAccent">@color/md_teal_300</item>
+    </style>
+
+    <style name="FloatingActionButton4">
         <item name="colorAccent">@color/md_teal_400</item>
     </style>
+
+
 
     <style name="AlertDialogCustom" parent="Theme.AppCompat.Light.Dialog.Alert">
         <item name="android:colorAccent">@color/colorPrimaryDark</item>

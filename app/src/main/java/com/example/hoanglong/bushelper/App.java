@@ -1,7 +1,9 @@
 package com.example.hoanglong.bushelper;
 
 import android.app.Application;
+import android.content.Context;
 import android.os.RemoteException;
+import android.support.multidex.MultiDex;
 import android.util.Log;
 
 import com.example.hoanglong.bushelper.POJO.Beacon;
@@ -86,6 +88,12 @@ public class App extends Application {
 
     public NetComponent getNetComponent() {
         return mNetComponent;
+    }
+
+    @Override
+    protected void attachBaseContext(Context context) {
+        super.attachBaseContext(context);
+        MultiDex.install(this);
     }
 
 //    public List<BusStopDB> getBusStopListFromDB(){

@@ -2,6 +2,7 @@ package com.example.hoanglong.bushelper;
 
 import android.Manifest;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
@@ -15,6 +16,8 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.view.ViewCompat;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.PopupMenu;
 import android.util.Log;
 import android.view.MenuItem;
@@ -42,6 +45,10 @@ import com.github.aakira.expandablelayout.ExpandableRelativeLayout;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.common.api.Status;
+import com.google.android.gms.location.places.Place;
+import com.google.android.gms.location.places.ui.PlaceAutocompleteFragment;
+import com.google.android.gms.location.places.ui.PlaceSelectionListener;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -49,6 +56,7 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polyline;
@@ -123,6 +131,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     @BindView(R.id.btnAdd)
     CounterFab btnAdd;
 
+    @BindView(R.id.btnHome)
+    FloatingActionButton btnHome;
+
     String textInstruction;
 
     boolean isMultipleMarker = false;
@@ -149,8 +160,23 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         ButterKnife.bind(this);
         ((App) getApplication()).getNetComponent().inject(this);
         mGoogleApiClient = Utils.getGoogleApiClient();
+        DatabaseManager.init(getBaseContext());
 
-        Window window = this.getWindow();
+        if (!Utils.checkInternetOn(getBaseContext())) {
+            Utils.createNetErrorDialog(MapsActivity.this);
+            return;
+        }
+
+        if (!Utils.isLocationEnabled(MapsActivity.this)) {
+            Utils.createLocationErrorDialog(MapsActivity.this);
+            return;
+        }
+
+//        if (android.os.Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
+//            btnHome.setVisibility(View.GONE);
+//        }
+
+            Window window = this.getWindow();
         window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
         window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
         window.setStatusBarColor(ContextCompat.getColor(this, R.color.md_teal_400));
@@ -161,19 +187,43 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         btnAdd.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
                 if (markerPoints.size() != 0) {
                     btnAdd.increase();
                     isMultipleMarker = true;
-                }else{
+                } else {
                     markerPoints.add(myLocation);
                     isMultipleMarker = false;
 
                 }
-
-
             }
         });
+
+        PlaceAutocompleteFragment autocompleteFragment = (PlaceAutocompleteFragment)
+                getFragmentManager().findFragmentById(R.id.place_autocomplete_fragment);
+        final LatLngBounds bounds = Utils.toBounds(new LatLng(10.793093, 106.653773), 200);
+        autocompleteFragment.setBoundsBias(bounds);
+        autocompleteFragment.setOnPlaceSelectedListener(new PlaceSelectionListener() {
+            @Override
+            public void onPlaceSelected(Place place) {
+                resetMapMarker(place.getLatLng());
+
+                mMap.moveCamera(CameraUpdateFactory.newLatLng(place.getLatLng()));
+                mMap.animateCamera(CameraUpdateFactory.zoomTo(14));
+
+                if (isMultipleMarker) {
+                    for (int i = 0; i <= markerPoints.size() - 2; i++) {
+                        from_my_location("transit", markerPoints.get(i), markerPoints.get(i + 1));
+                    }
+                }
+                from_my_location("transit", myLocation, markerPoints.get(0));
+            }
+
+            @Override
+            public void onError(Status status) {
+                Log.i("test", "An error occurred: " + status);
+            }
+        });
+
 
         btnAdd.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
@@ -188,22 +238,35 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 lines.clear();
                 routeName.clear();
 
+                totalTime = 0;
+                totalDistance = 0;
+                textInstruction = "";
+                checkMultipleClick = false;
+                showDistanceDuration.setText("Please choose destination");
+                tvInstruction.setText(textInstruction);
+
                 MarkerOptions options2 = new MarkerOptions();
                 options2.position(myLocation);
                 options2.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED));
                 options2.title(getString(R.string.your_location));
                 mMap.addMarker(options2);
 
-
                 return false;
             }
         });
 
+        btnHome.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(getBaseContext(), MainActivity.class);
+                startActivity(intent);
+                finish();
+            }
+        });
 
-
-        if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            Utils.checkLocationPermission(this);
-        }
+//        if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+//            Utils.checkLocationPermission(this);
+//        }
 
         // Initializing
         markerPoints = new ArrayList<>();
@@ -223,6 +286,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         expandableLayout1.toggle();
+        ViewCompat.setTranslationZ(expandableLayout1, 100);
+
     }
 
     @OnClick(R.id.expandableButton1)
@@ -232,11 +297,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     @Override
     public void onMapReady(GoogleMap googleMap) {
+
         mMap = googleMap;
         mMap.setOnMarkerDragListener(this);
         mMap.setOnMarkerClickListener(this);
         mMap.getUiSettings().setMapToolbarEnabled(false);
-        mMap.setMyLocationEnabled(true);
+        mMap.setMyLocationEnabled(false);
         mMap.getUiSettings().setRotateGesturesEnabled(true);
         mMap.getUiSettings().setCompassEnabled(true);
 
@@ -253,9 +319,15 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         mMap.animateCamera(CameraUpdateFactory.zoomTo(14));
 
         //Initialize the first stop
+        final LatLng busStart;
         final TheLocation aBustop = getIntent().getParcelableExtra("busStop");
-        final LatLng busStart = new LatLng(aBustop.getLatitude(), aBustop.getLongitude());
-        markerPoints.add(busStart);
+        if (aBustop == null) {
+            busStart = new LatLng(myLocation.latitude, myLocation.longitude);
+            markerPoints.add(busStart);
+        } else {
+            busStart = new LatLng(aBustop.getLatitude(), aBustop.getLongitude());
+            markerPoints.add(busStart);
+        }
 
         serverAPI = RetrofitUtils.get().create(ServerAPI.class);
         serverAPI = retrofit.create(ServerAPI.class);
@@ -266,7 +338,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 MarkerOptions options1 = new MarkerOptions();
                 options1.position(busStart);
                 options1.title(addr.substring(0, addr.indexOf(",")));
-                options1.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_YELLOW));
+                if (aBustop == null) {
+                    options1.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED));
+
+                } else {
+                    options1.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_YELLOW));
+                }
                 options1.draggable(true);
                 mMap.addMarker(options1).setTag(busStart);
             }
@@ -292,100 +369,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             @Override
             public void onMapClick(final LatLng point) {
                 checkMultipleClick = false;
-                slidingPaneLayout.setPanelState(SlidingUpPanelLayout.PanelState.COLLAPSED);
 
-                // clearing map and generating new marker points if user clicks on map
-                if (markerPoints.size() >= 1) {
-                    mMap.clear();
-                    lines.clear();
-                    routeName.clear();
-
-                    LatLng tmp;
-                    if (markerPoints.size() > 1) {
-                        tmp = markerPoints.get(1);
-                    } else {
-                        tmp = markerPoints.get(0);
-                    }
-
-                    if (!isMultipleMarker) {
-                        markerPoints.clear();
-                        markerPoints = new ArrayList<>();
-                        markerPoints.add(tmp);
-                    } else {
-                        if (markerPoints.size() >= btnAdd.getCount()) {
-                            markerPoints.remove(0);
-                        }
-                    }
-
-                    if (isMultipleMarker) {
-                        for (final LatLng item : markerPoints) {
-                            serverAPI.getPlaceID(item.latitude + "," + item.longitude).enqueue(new Callback<PlaceDetail>() {
-                                @Override
-                                public void onResponse(Call<PlaceDetail> call, Response<PlaceDetail> response) {
-                                    String addr = response.body().getAddr_comp().get(0).getAddress();
-                                    MarkerOptions options1 = new MarkerOptions();
-                                    options1.position(item);
-                                    options1.title(addr.substring(0, addr.indexOf(",")));
-                                    options1.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_ORANGE));
-                                    options1.draggable(true);
-                                    mMap.addMarker(options1).setTag(item);
-
-                                    MarkerOptions options2 = new MarkerOptions();
-                                    options2.position(myLocation);
-                                    options2.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED));
-                                    options2.title(getString(R.string.your_location));
-                                    mMap.addMarker(options2);
-                                }
-
-                                @Override
-                                public void onFailure(Call<PlaceDetail> call, Throwable t) {
-
-                                }
-                            });
-                        }
-                    }
-
-                    MarkerOptions options2 = new MarkerOptions();
-                    options2.position(myLocation);
-                    options2.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED));
-                    options2.title(getString(R.string.your_location));
-                    mMap.addMarker(options2);
-
-                    totalTime = 0;
-                    totalDistance = 0;
-                    textInstruction = "";
-                }
-                showDistanceDuration.setText("Please choose destination");
-
-                if (isMultipleMarker) {
-                    // Adding new item to the ArrayList
-                    markerPoints.add(point);
-                } else {
-                    markerPoints.set(0, point);
-                }
-
-                serverAPI.getPlaceID(point.latitude + "," + point.longitude).enqueue(new Callback<PlaceDetail>() {
-                    @Override
-                    public void onResponse(Call<PlaceDetail> call, Response<PlaceDetail> response) {
-                        String addr = response.body().getAddr_comp().get(0).getAddress();
-
-                        // Creating MarkerOptions
-                        MarkerOptions options = new MarkerOptions();
-                        // Setting the position of the marker
-                        options.position(point);
-                        options.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_YELLOW));
-                        options.title(addr.substring(0, addr.indexOf(",")));
-                        options.draggable(true);
-                        // Add new marker to the Google Map Android API V2
-                        mMap.addMarker(options).setTag(point);
-                    }
-
-                    @Override
-                    public void onFailure(Call<PlaceDetail> call, Throwable t) {
-
-                    }
-                });
-
+                resetMapMarker(point);
             }
         });
 
@@ -402,8 +387,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         }
                     }
                     from_my_location("transit", myLocation, markerPoints.get(0));
-//                    from_my_location("transit", origin, dest);
-
                     checkMultipleClick = true;
                 }
 
@@ -543,7 +526,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                         }
 
                                         BusStop aBusStop = new BusStop();
-                                        textInstruction += "\n\n============== ROUTE " + labelIndex + " ==============\n";
+                                        textInstruction += "============== ROUTE " + labelIndex + " ==============\n";
                                         for (Step tmp : instruction) {
                                             if (tmp.getTransit_detail() != null) {
                                                 textInstruction += "\t• Get bus number \"" + tmp.getTransit_detail().getLine().getBusName() + "\"\n";
@@ -556,7 +539,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                                 textInstruction += "\t• " + tmp.getInstruction() + "\n";
                                             }
                                         }
-
+                                        textInstruction += "\n";
                                         busStopListFromGoogle.add(aBusStop);
 
                                         LinearLayout distanceMarkerLayout = (LinearLayout) getLayoutInflater().inflate(R.layout.poly_label, null);
@@ -567,7 +550,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
                                         TextView positionDistance = (TextView) distanceMarkerLayout.findViewById(R.id.positionDistance);
                                         positionDistance.setText("Route " + labelIndex);
-                                        GradientDrawable bgShape = (GradientDrawable)positionDistance.getBackground();
+                                        GradientDrawable bgShape = (GradientDrawable) positionDistance.getBackground();
                                         bgShape.setColor(line.getColor());
 
 
@@ -657,8 +640,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         }
         routeName.clear();
 
-        for(LatLng item : markerPoints){
-            if(marker.getTag().equals(item)){
+        for (LatLng item : markerPoints) {
+            if (marker.getTag().equals(item)) {
                 markerPoints.set(markerPoints.indexOf(item), marker.getPosition());
             }
         }
@@ -666,6 +649,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         totalDistance = 0;
         textInstruction = "";
         checkMultipleClick = false;
+        showDistanceDuration.setText("Distance: 0 km, duration: 0 secs");
+        tvInstruction.setText(textInstruction);
     }
 
 
@@ -674,8 +659,20 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         if (slidingPaneLayout.getPanelState() == SlidingUpPanelLayout.PanelState.EXPANDED) {
             slidingPaneLayout.setPanelState(SlidingUpPanelLayout.PanelState.COLLAPSED);
         } else {
-            Intent intent = new Intent(getBaseContext(), MainActivity.class);
-            startActivity(intent);
+            new AlertDialog.Builder(this)
+                    .setTitle("Really Exit?")
+                    .setMessage("Are you sure you want to exit?")
+                    .setNegativeButton(android.R.string.no, null)
+                    .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {
+                            Intent a = new Intent(Intent.ACTION_MAIN);
+                            a.addCategory(Intent.CATEGORY_HOME);
+                            a.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                            startActivity(a);
+                        }
+                    }).create().show();
         }
     }
 
@@ -762,6 +759,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                         totalDistance = 0;
                                         textInstruction = "";
                                         checkMultipleClick = false;
+                                        showDistanceDuration.setText("Distance: 0 km, duration: 0 secs");
+                                        tvInstruction.setText(textInstruction);
+
                                         marker.remove();
                                         Toast.makeText(getBaseContext(), R.string.marker_removed, Toast.LENGTH_SHORT).show();
                                     } else {
@@ -785,8 +785,104 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             });
         }
         return false;
-
     }
 
+    private void resetMapMarker(final LatLng point) {
+        slidingPaneLayout.setPanelState(SlidingUpPanelLayout.PanelState.COLLAPSED);
+
+        // clearing map and generating new marker points if user clicks on map
+        if (markerPoints.size() >= 1) {
+            mMap.clear();
+            lines.clear();
+            routeName.clear();
+
+            LatLng tmp;
+            if (markerPoints.size() > 1) {
+                tmp = markerPoints.get(1);
+            } else {
+                tmp = markerPoints.get(0);
+            }
+
+            if (!isMultipleMarker) {
+                markerPoints.clear();
+                markerPoints = new ArrayList<>();
+                markerPoints.add(tmp);
+            } else {
+                if (markerPoints.size() >= btnAdd.getCount()) {
+                    markerPoints.remove(0);
+                }
+            }
+
+            if (isMultipleMarker) {
+                for (final LatLng item : markerPoints) {
+                    serverAPI.getPlaceID(item.latitude + "," + item.longitude).enqueue(new Callback<PlaceDetail>() {
+                        @Override
+                        public void onResponse(Call<PlaceDetail> call, Response<PlaceDetail> response) {
+                            String addr = response.body().getAddr_comp().get(0).getAddress();
+                            MarkerOptions options1 = new MarkerOptions();
+                            options1.position(item);
+                            options1.title(addr.substring(0, addr.indexOf(",")));
+                            options1.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_ORANGE));
+                            options1.draggable(true);
+                            mMap.addMarker(options1).setTag(item);
+
+                            MarkerOptions options2 = new MarkerOptions();
+                            options2.position(myLocation);
+                            options2.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED));
+                            options2.title(getString(R.string.your_location));
+                            mMap.addMarker(options2);
+                        }
+
+                        @Override
+                        public void onFailure(Call<PlaceDetail> call, Throwable t) {
+
+                        }
+                    });
+                }
+            }
+
+            MarkerOptions options2 = new MarkerOptions();
+            options2.position(myLocation);
+            options2.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED));
+            options2.title(getString(R.string.your_location));
+            mMap.addMarker(options2);
+
+            totalTime = 0;
+            totalDistance = 0;
+            textInstruction = "";
+        }
+        showDistanceDuration.setText("Distance: 0 km, duration: 0 secs");
+        tvInstruction.setText(textInstruction);
+
+
+        if (isMultipleMarker) {
+            // Adding new item to the ArrayList
+            markerPoints.add(point);
+        } else {
+            markerPoints.set(0, point);
+        }
+
+        serverAPI.getPlaceID(point.latitude + "," + point.longitude).enqueue(new Callback<PlaceDetail>() {
+            @Override
+            public void onResponse(Call<PlaceDetail> call, Response<PlaceDetail> response) {
+                String addr = response.body().getAddr_comp().get(0).getAddress();
+
+                // Creating MarkerOptions
+                MarkerOptions options = new MarkerOptions();
+                // Setting the position of the marker
+                options.position(point);
+                options.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_YELLOW));
+                options.title(addr.substring(0, addr.indexOf(",")));
+                options.draggable(true);
+                // Add new marker to the Google Map Android API V2
+                mMap.addMarker(options).setTag(point);
+            }
+
+            @Override
+            public void onFailure(Call<PlaceDetail> call, Throwable t) {
+
+            }
+        });
+    }
 
 }

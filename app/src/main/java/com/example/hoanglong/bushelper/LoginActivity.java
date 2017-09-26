@@ -3,15 +3,19 @@ package com.example.hoanglong.bushelper;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.graphics.Typeface;
+import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.app.FragmentActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.hoanglong.bushelper.POJO.EmailInfo;
+import com.example.hoanglong.bushelper.utils.Utils;
 import com.google.android.gms.auth.api.Auth;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
@@ -35,54 +39,82 @@ public class LoginActivity extends FragmentActivity implements GoogleApiClient.O
     private GoogleApiClient mGoogleApiClient;
     private ProgressDialog mProgressDialog;
 
-//    private ServerAPI serverAPI;
+    //    private ServerAPI serverAPI;
 //    private UserAccount userAccount;
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        switch (requestCode) {
+            case 99: {
+
+                // If request is cancelled, the result arrays are empty.
+                if (grantResults.length > 0
+                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+
+                    // permission was granted, yay! Do the
+                    // contacts-related task you need to do.
+                } else {
+
+                    // permission denied, boo! Disable the
+                    // functionality that depends on this permission.
+                    Toast.makeText(getBaseContext(), "Permission denied, app is closing", Toast.LENGTH_SHORT).show();
+                    System.exit(0);
+                }
+                return;
+            }
+
+            // other 'case' lines to check for other
+            // permissions this app might request
+        }
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
+//        if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.M){
+            Typeface custom_font = Typeface.createFromAsset(getAssets(), "fonts/futurathin.TTF");
+            Typeface custom_font2 = Typeface.createFromAsset(getAssets(), "fonts/homestead.TTF");
 
-        Typeface custom_font = Typeface.createFromAsset(getAssets(), "fonts/futurathin.TTF");
-        Typeface custom_font2 = Typeface.createFromAsset(getAssets(), "fonts/homestead.TTF");
+            TextView tvVolunteer = (TextView) findViewById(R.id.tvVolunteer);
+            TextView tvRelative = (TextView) findViewById(R.id.tvRelative);
+            TextView tvTitle = (TextView) findViewById(R.id.title_text);
 
-        TextView tvVolunteer = (TextView) findViewById(R.id.tvVolunteer);
-        TextView tvRelative = (TextView) findViewById(R.id.tvRelative);
-        TextView tvTitle = (TextView) findViewById(R.id.title_text);
+            if (custom_font != null) {
+                tvVolunteer.setTypeface(custom_font);
+                tvRelative.setTypeface(custom_font);
+                tvTitle.setTypeface(custom_font2);
+            }
 
-        if (custom_font != null) {
-            tvVolunteer.setTypeface(custom_font);
-            tvRelative.setTypeface(custom_font);
-            tvTitle.setTypeface(custom_font2);
-        }
+            // Button listeners
+            findViewById(R.id.sign_in_button).setOnClickListener(this);
+            findViewById(R.id.btnGuest).setOnClickListener(this);
 
-        // Button listeners
-        findViewById(R.id.sign_in_button).setOnClickListener(this);
-        findViewById(R.id.btnGuest).setOnClickListener(this);
+            // [START configure_signin]
+            // Configure sign-in to request the user's ID, email address, and basic
+            // profile. ID and basic profile are included in DEFAULT_SIGN_IN.
+            GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                    .requestEmail()
+                    .build();
+            // [END configure_signin]
 
-        // [START configure_signin]
-        // Configure sign-in to request the user's ID, email address, and basic
-        // profile. ID and basic profile are included in DEFAULT_SIGN_IN.
-        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                .requestEmail()
-                .build();
-        // [END configure_signin]
-
-        // [START build_client]
-        // Build a GoogleApiClient with access to the Google Sign-In API and the
-        // options specified by gso.
-        mGoogleApiClient = new GoogleApiClient.Builder(this)
-                .enableAutoManage(this /* FragmentActivity */, this /* OnConnectionFailedListener */)
-                .addApi(Auth.GOOGLE_SIGN_IN_API, gso)
-                .build();
-        // [END build_client]
+            // [START build_client]
+            // Build a GoogleApiClient with access to the Google Sign-In API and the
+            // options specified by gso.
+            mGoogleApiClient = new GoogleApiClient.Builder(this)
+                    .enableAutoManage(this /* FragmentActivity */, this /* OnConnectionFailedListener */)
+                    .addApi(Auth.GOOGLE_SIGN_IN_API, gso)
+                    .build();
+            // [END build_client]
 
 
-        SignInButton signInButton = (SignInButton) findViewById(R.id.sign_in_button);
-        signInButton.setSize(SignInButton.SIZE_WIDE);
-        signInButton.setScopes(gso.getScopeArray());
-
+            SignInButton signInButton = (SignInButton) findViewById(R.id.sign_in_button);
+            signInButton.setSize(SignInButton.SIZE_WIDE);
+            signInButton.setScopes(gso.getScopeArray());
+            if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                Utils.checkLocationPermission(this);
+            }
 //        serverAPI = RetrofitUtils.get().create(ServerAPI.class);
+
     }
 
 
@@ -99,7 +131,7 @@ public class LoginActivity extends FragmentActivity implements GoogleApiClient.O
         if (!userID.equals("")) {
             // If the user's cached credentials are valid, the OptionalPendingResult will be "done"
             // and the GoogleSignInResult will be available instantly.
-            Intent intent = new Intent(getBaseContext(), MainActivity.class);
+            Intent intent = new Intent(getBaseContext(), MapsActivity.class);
             startActivity(intent);
             finish();
         } else {
@@ -165,7 +197,7 @@ public class LoginActivity extends FragmentActivity implements GoogleApiClient.O
             String jsonAccount = gson2.toJson(account);
             editor.putString("userAccount", jsonAccount);
             editor.commit();
-            Intent intent = new Intent(getBaseContext(), MainActivity.class);
+            Intent intent = new Intent(getBaseContext(), MapsActivity.class);
             startActivity(intent);
             finish();
 
@@ -319,7 +351,7 @@ public class LoginActivity extends FragmentActivity implements GoogleApiClient.O
                 editor.putString("userAccount", "");
                 editor.commit();
 
-                Intent intent = new Intent(getBaseContext(), MainActivity.class);
+                Intent intent = new Intent(getBaseContext(), MapsActivity.class);
                 startActivity(intent);
                 finish();
                 break;

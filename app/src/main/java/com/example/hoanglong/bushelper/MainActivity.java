@@ -121,7 +121,7 @@ public class MainActivity extends AppCompatActivity {
         ButterKnife.bind(this);
 
         getSupportActionBar().setElevation(0);
-        DatabaseManager.init(getBaseContext());
+//        DatabaseManager.init(getBaseContext());
 
         Utils.initialGoogleApiClient(this);
         mGoogleApiClient = Utils.getGoogleApiClient();
@@ -176,6 +176,18 @@ public class MainActivity extends AppCompatActivity {
                             Toast.makeText(getBaseContext(), R.string.please_choose_location, Toast.LENGTH_SHORT).show();
 
                         }
+                    }
+                }else{
+                    Intent intent = new Intent(getBaseContext(), MapsActivity.class);
+                    if (result != null) {
+                        Toast.makeText(getBaseContext(), "Starting Map", Toast.LENGTH_SHORT).show();
+
+                        intent.putExtra("busStop", result);
+                        startActivity(intent);
+                        finish();
+                    } else {
+                        Toast.makeText(getBaseContext(), R.string.please_choose_location, Toast.LENGTH_SHORT).show();
+
                     }
                 }
 
@@ -235,13 +247,17 @@ public class MainActivity extends AppCompatActivity {
                 if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                     if (Utils.checkLocationPermission(MainActivity.this)) {
 
-                        mLocation = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
-                        result = new TheLocation(0, "My location", mLocation.getLatitude(), mLocation.getLongitude());
+//                        mLocation = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+//                        result = new TheLocation(0, "My location", mLocation.getLatitude(), mLocation.getLongitude());
                         Intent intent = new Intent(getBaseContext(), MapsActivity.class);
-                        intent.putExtra("busStop", result);
+//                        intent.putExtra("busStop", result);
                         startActivity(intent);
                         finish();
                     }
+                }else{
+                    Intent intent = new Intent(getBaseContext(), MapsActivity.class);
+                    startActivity(intent);
+                    finish();
                 }
 
 //                if (ActivityCompat.checkSelfPermission(getBaseContext(), android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getBaseContext(), android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
@@ -470,22 +486,10 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
+        Intent intent = new Intent(getBaseContext(), MapsActivity.class);
+        startActivity(intent);
+        finish();
 
-
-        new AlertDialog.Builder(this)
-                .setTitle("Really Exit?")
-                .setMessage("Are you sure you want to exit?")
-                .setNegativeButton(android.R.string.no, null)
-                .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
-
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
-                        Intent a = new Intent(Intent.ACTION_MAIN);
-                        a.addCategory(Intent.CATEGORY_HOME);
-                        a.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                        startActivity(a);
-                    }
-                }).create().show();
     }
 
     //Subscribe action for Event Bus
