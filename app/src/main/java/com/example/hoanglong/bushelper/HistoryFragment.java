@@ -60,6 +60,7 @@ public class HistoryFragment extends Fragment {
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_history, container, false);
         ButterKnife.bind(this, rootView);
+        DatabaseManager.init(getActivity().getBaseContext());
 
         rvHistory.setLayoutManager(new GridLayoutManager(getActivity(), 2));
 

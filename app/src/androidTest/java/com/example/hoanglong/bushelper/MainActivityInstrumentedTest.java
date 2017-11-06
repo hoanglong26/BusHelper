@@ -55,7 +55,7 @@ public class MainActivityInstrumentedTest {
             onView(isAssignableFrom(AutoCompleteTextView.class)).perform(typeText("hung"));
 
 
-            Thread.sleep(1000);
+            Thread.sleep(2500);
 
 
             onView(withText(containsString("Hung Vuong Plaza")))

@@ -316,7 +316,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         myLocation = new LatLng(mLocation.getLatitude(), mLocation.getLongitude());
         mMap.addMarker(new MarkerOptions().position(myLocation).title(getString(R.string.your_location)));
         mMap.moveCamera(CameraUpdateFactory.newLatLng(myLocation));
-        mMap.animateCamera(CameraUpdateFactory.zoomTo(14));
+        mMap.animateCamera(CameraUpdateFactory.zoomTo(13));
 
         //Initialize the first stop
         final LatLng busStart;

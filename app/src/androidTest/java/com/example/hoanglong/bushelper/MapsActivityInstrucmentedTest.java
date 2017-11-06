@@ -58,7 +58,7 @@ public class MapsActivityInstrucmentedTest {
             onView(isAssignableFrom(AutoCompleteTextView.class)).perform(typeText("new"));
 
 
-            Thread.sleep(1000);
+            Thread.sleep(4000);
 
 
             onView(withText(containsString("New Zealand")))
@@ -123,7 +123,7 @@ public class MapsActivityInstrucmentedTest {
             onView(isAssignableFrom(AutoCompleteTextView.class)).perform(typeText("an lac"));
 
 
-            Thread.sleep(1000);
+            Thread.sleep(4000);
 
 
             onView(withText(containsString("An Lac High School")))
@@ -138,7 +138,7 @@ public class MapsActivityInstrucmentedTest {
             Thread.sleep(1000);
 
             UiDevice uiDevice = UiDevice.getInstance(getInstrumentation());
-            UiObject mMarker1 = uiDevice.findObject(new UiSelector().descriptionContains("Final stop"));
+            UiObject mMarker1 = uiDevice.findObject(new UiSelector().descriptionContains("425"));
 
             mMarker1.click();
             Thread.sleep(1000);

@@ -60,6 +60,7 @@ public class FavoriteFragment extends Fragment {
         //set our adapters to the RecyclerView
         //we wrap our FastAdapter inside the ItemAdapter -> This allows us to chain adapters for more complex useCases
         rvFavorite.setAdapter(fastAdapter);
+        DatabaseManager.init(getActivity().getBaseContext());
 
         //set the items to your ItemAdapter
         List locationList = DatabaseManager.getInstance().getAllFavorites();
