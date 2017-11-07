@@ -45,18 +45,16 @@ public class MainActivityInstrumentedTest {
         mMainActivity = mActivityRule.getActivity();
     }
 
+    //type a string to search box and click on result, then press Go button. Input: a string, Expected output: show location on map
     @Test
     public void inputValidAndChooseThenPressGo() {
-
         try {
             onView(withId(R.id.search)).perform(click());
 
 
             onView(isAssignableFrom(AutoCompleteTextView.class)).perform(typeText("hung"));
 
-
             Thread.sleep(2500);
-
 
             onView(withText(containsString("Hung Vuong Plaza")))
                     .inRoot(withDecorView(not(Matchers.is(mMainActivity.getWindow().getDecorView()))))
@@ -75,6 +73,7 @@ public class MainActivityInstrumentedTest {
 
     }
 
+    //type a string to search box, then press Go button. Input: nothing, Expected output: show toast ask for input
     @Test
     public void inputNothingPressGo() {
 
@@ -94,6 +93,7 @@ public class MainActivityInstrumentedTest {
 
     }
 
+    //type a string to search box, then press Go button. Input: random string, Expected output: show toast ask for input
     @Test
     public void inputInvalidPressGo() {
 
@@ -116,7 +116,7 @@ public class MainActivityInstrumentedTest {
 
     }
 
-
+    //Choose a location from list. Input: click on item, Expected output: show location on map
     @Test
     public void clickOnRecyclerviewItem() {
         onView(withId(R.id.rvHistory))
@@ -126,6 +126,7 @@ public class MainActivityInstrumentedTest {
 
     }
 
+    //press on my location button. Input: click on floating button, Expected output: show my location on map
     @Test
     public void clickFloatingActionButton() {
         onView(withId(R.id.btnMylocation)).perform(click());

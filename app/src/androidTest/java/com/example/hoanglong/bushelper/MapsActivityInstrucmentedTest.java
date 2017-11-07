@@ -47,26 +47,21 @@ public class MapsActivityInstrucmentedTest {
         mMainActivity = mActivityRule.getActivity();
     }
 
-
+    //type a string to search box and click on result, then press Go button. Input: a string, Expected output: show location on map
     @Test
     public void inputValidThenPressGoWithNoRoute() {
-
         try {
             onView(withId(R.id.search)).perform(click());
 
-
             onView(isAssignableFrom(AutoCompleteTextView.class)).perform(typeText("new"));
 
-
             Thread.sleep(4000);
-
 
             onView(withText(containsString("New Zealand")))
                     .inRoot(withDecorView(not(Matchers.is(mMainActivity.getWindow().getDecorView()))))
                     .perform(click());
 
-
-            Thread.sleep(1000);
+            Thread.sleep(3000);
 
             onView(withId(R.id.searchBtn)).perform(click());
 
@@ -131,7 +126,7 @@ public class MapsActivityInstrucmentedTest {
                     .perform(click());
 
 
-            Thread.sleep(1000);
+            Thread.sleep(3000);
 
             onView(withId(R.id.searchBtn)).perform(click());
 
@@ -141,7 +136,7 @@ public class MapsActivityInstrucmentedTest {
             UiObject mMarker1 = uiDevice.findObject(new UiSelector().descriptionContains("425"));
 
             mMarker1.click();
-            Thread.sleep(1000);
+            Thread.sleep(2000);
 
             onView(withText(containsString("Remove marker")))
                     .inRoot(withDecorView(not(Matchers.is(mMainActivity.getWindow().getDecorView()))))
@@ -183,7 +178,6 @@ public class MapsActivityInstrucmentedTest {
                     .check(matches(isDisplayed()));
 
         } catch (UiObjectNotFoundException e) {
-
             e.printStackTrace();
         } catch (InterruptedException e) {
             e.printStackTrace();

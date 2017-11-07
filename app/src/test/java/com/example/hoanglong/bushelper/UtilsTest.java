@@ -26,6 +26,7 @@ import static junit.framework.TestCase.assertEquals;
 @RunWith(RobolectricTestRunner.class)
 @Config(constants = BuildConfig.class)
 public class UtilsTest {
+
     private static boolean compareBitmap(Bitmap b1, Bitmap b2) {
         try {
             if (b1.getWidth() == b2.getWidth() && b1.getHeight() == b2.getHeight()) {
@@ -42,6 +43,7 @@ public class UtilsTest {
         }
     }
 
+    //convert decoded string of image to bitmap. Input: decoded string, Expected Output: true
     @Test
     public void stringToBitMapTrue() throws Exception {
 //        Activity activity = Robolectric.setupActivity(MainActivity.class);//
@@ -50,14 +52,15 @@ public class UtilsTest {
         assertEquals(true, compareBitmap(expectedThumbnail,Utils.StringToBitMap(tmp)));
     }
 
+    //convert decoded string of image to bitmap. Input: null, Expected Output: null
     @Test
     public void stringToBitMapNull() throws Exception {
 //        Activity activity = Robolectric.setupActivity(MainActivity.class);//
         Bitmap expectedThumbnail = null;
-//        String tmp = Utils.BitMapToString(expectedThumbnail);
         assertEquals(false, compareBitmap(expectedThumbnail,Utils.StringToBitMap(null)));
     }
 
+    //Get bounded radius from lat, long. Input: a coordinate and radius, Expected Output: a radius bound
     @Test
     public void toBoundsTrue() throws Exception {
         LatLng southwest = new LatLng(10.898201353892782, 106.29816832441604);
@@ -67,28 +70,26 @@ public class UtilsTest {
         assertEquals(sampleBounds, Utils.toBounds(new LatLng(10.9, 106.3), 200));
     }
 
+    //Get bounded radius from lat, long. Input: a coordinate and 0 radius, Expected Output: null
     @Test
     public void toBoundsRadiusZero() throws Exception {
         LatLngBounds sampleBounds = null;
         assertEquals(sampleBounds, Utils.toBounds(new LatLng(10.9, 106.3), 0));
     }
 
+    //Get bounded radius from lat, long. Input: a coordinate and negative radius, Expected Output: null
     @Test
     public void toBoundsRadiusNegative() throws Exception {
         LatLngBounds sampleBounds = null;
         assertEquals(sampleBounds, Utils.toBounds(new LatLng(10.9, 106.3), -5));
     }
 
+    //Get bounded radius from lat, long. Input: null coordinate and radius, Expected Output: null
     @Test
     public void toBoundsLatLongNull() throws Exception {
         LatLngBounds sampleBounds = null;
         assertEquals(sampleBounds, Utils.toBounds(null, 50));
     }
 
-    @Test
-    public void decodePolyTrue() throws Exception {
-//        LatLngBounds sampleBounds = null;
-//        assertEquals(sampleBounds, Utils.toBounds(null, 50));
-    }
 
 }
